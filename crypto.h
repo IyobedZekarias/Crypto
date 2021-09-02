@@ -7,7 +7,8 @@
 #include <fstream> 
 #include <iterator>
 #include <algorithm>
-#include <immintrin.h> 
+#include <immintrin.h>
+#include <cpuid.h> 
 
 #ifndef _CRYPTO_H
 #define _CRYPTO_H

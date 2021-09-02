@@ -73,6 +73,14 @@ namespace crypto {
    //Generate random numbers with rdseed
    //Exact same process as rdrand
    bool rdseed(size_t bytes, buffer_t &buffer){
+        uint32_t eax, ebx, ecx, edx;
+        if (__get_cpuid(0x80000006, &eax, &ebx, &ecx, &edx)) {
+            //std::cout << "RDSEED" << (ebx >> 18) << std::endl; 
+            if(!(ebx >> 18)) {std::cout << "CPU DOES NOT SUPPORT RDSEED\n"; return false;}
+        } else {
+            printf("Could not get CPU information");
+            return false;
+        }
         int high = 64, mid = 32, low = 16, bits = static_cast<int>(bytes) * 8; 
         while(bits > 0){
             if(bits >= high){
