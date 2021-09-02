@@ -23,6 +23,7 @@ int main()
     buffer.clear();
     LCG(12, buffer); 
     cout << "LCG:    " << buffer;  
+    buffer.clear(); 
 
     urand(16, buffer); 
     rdrand(16, buffer); 

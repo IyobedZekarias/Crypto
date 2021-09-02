@@ -38,21 +38,21 @@ namespace crypto {
             if(bits >= high){
                 uint64_t random_val; 
                 _rdrand64_step(reinterpret_cast<unsigned long long*>(&random_val)); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), sizeof(random_val), std::back_inserter(buffer));
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), sizeof(random_val), std::back_inserter(buffer));
                 bits -= 64; 
             }
             //if there are more than 32 bits left generate 32 random bits then copy those into buffer
             else if(bits < high && bits >= mid){
                 uint32_t random_val; 
                 _rdrand32_step(&random_val); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), sizeof(random_val), std::back_inserter(buffer)); 
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), sizeof(random_val), std::back_inserter(buffer)); 
                 bits -= 32;
             }
             //if there are more than 16 bits left generate 16 random bits then copy those into buffer
             else if(bits < mid && bits >= low){
                 uint16_t random_val;
                 _rdrand16_step(&random_val); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), sizeof(random_val), std::back_inserter(buffer)); 
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), sizeof(random_val), std::back_inserter(buffer)); 
                 bits -= 16;
             } 
             //if there are less than 16 bits generate 16 bits but use either the first 8 bits or all 16
@@ -60,7 +60,7 @@ namespace crypto {
             else {
                 uint16_t random_val;
                 _rdrand16_step(&random_val); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), (bits > 8? 2:1), std::back_inserter(buffer)); 
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), (bits > 8? 2:1), std::back_inserter(buffer)); 
                 bits = 0;
                 return true;
             }
@@ -78,24 +78,24 @@ namespace crypto {
             if(bits >= high){
                 uint64_t random_val; 
                 _rdseed64_step(reinterpret_cast<unsigned long long*>(&random_val)); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), sizeof(random_val), std::back_inserter(buffer));
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), sizeof(random_val), std::back_inserter(buffer));
                 bits -= 64; 
             }
             else if(bits < high && bits >= mid){
                 uint32_t random_val; 
                 _rdseed32_step(&random_val); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), sizeof(random_val), std::back_inserter(buffer)); 
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), sizeof(random_val), std::back_inserter(buffer)); 
                 bits -= 32;
             }
             else if(bits < mid && bits >= low){
                 uint16_t random_val;
                 _rdseed16_step(&random_val); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), sizeof(random_val), std::back_inserter(buffer)); 
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), sizeof(random_val), std::back_inserter(buffer)); 
                 bits -= 16;
             } else {
                 uint16_t random_val;
                 _rdseed16_step(&random_val); 
-                std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&random_val)), (bits > 8? 2:1), std::back_inserter(buffer)); 
+                std::copy_n(reinterpret_cast<uint8_t*>(&random_val), (bits > 8? 2:1), std::back_inserter(buffer)); 
                 bits = 0;
                 return true;
             }
@@ -112,19 +112,19 @@ namespace crypto {
         //pass in the requested bytes if less than 4 bytes are requested
         if(bytes < 4){
             auto temp = rd(); 
-            std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&temp)), bytes, std::back_inserter(buffer)); 
+            std::copy_n(reinterpret_cast<uint8_t*>(&temp), bytes, std::back_inserter(buffer)); 
             return true; 
         }
         //keep generating random numbers until you reach the floor of bytes/4
         //push the correct number of bytes into buffer
         for(int i = 0; i < std::floor(bytes/4); i++){
             auto temp = rd(); 
-            std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&temp)), sizeof(temp), std::back_inserter(buffer)); 
+            std::copy_n(reinterpret_cast<uint8_t*>(&temp), sizeof(temp), std::back_inserter(buffer)); 
         }
         //if there is a remainder for bytes / 4 this process will generate one more random number and insert the remainder into buffer
         if(bytes % 4){
             auto temp = rd(); 
-            std::copy_n(static_cast<uint8_t*>(static_cast<void*>(&temp)), (bytes % 4), std::back_inserter(buffer)); 
+            std::copy_n(reinterpret_cast<uint8_t*>(&temp), (bytes % 4), std::back_inserter(buffer)); 
         }
 
         if(buffer.size() - startsize) return true; 
@@ -135,7 +135,7 @@ namespace crypto {
     bool LCG(size_t bytes, buffer_t &buffer){
         //seed will by randomly generated by rdseed
         uint32_t random_val; 
-        _rdseed32_step(&random_val); 
+        _rdrand32_step(&random_val); 
         if(LCG(bytes, buffer, random_val)) return true; 
         return false; 
     }
@@ -151,9 +151,9 @@ namespace crypto {
          
         //copy the middle 32 bits into buffer
         //copy the outer bits into the next seed
-        copy_n(static_cast<uint8_t*>(static_cast<void*>(&ans[2])), (bytes > 4? 4:bytes), std::back_inserter(buffer)); 
-        copy_n(static_cast<uint8_t*>(static_cast<void*>(&ans[0])), 2, std::back_inserter(seedarr));
-        copy_n(static_cast<uint8_t*>(static_cast<void*>(&ans[6])), 2, std::back_inserter(seedarr)); 
+        copy_n(reinterpret_cast<uint8_t*>(&ans[2]), (bytes > 4? 4:bytes), std::back_inserter(buffer)); 
+        copy_n(reinterpret_cast<uint8_t*>(&ans[0]), 2, std::back_inserter(seedarr));
+        copy_n(reinterpret_cast<uint8_t*>(&ans[6]), 2, std::back_inserter(seedarr)); 
         
         //set bytes and seed for what they need to be for the next recursion
         bytes > 4? bytes -= 4:bytes = 0; 

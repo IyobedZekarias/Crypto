@@ -5,7 +5,7 @@ rand: rand.cpp crypto.cpp
 tests: tests.cpp crypto.cpp
 
 test: tests
-	valgrind -q ./tests
+	valgrind --vgdb=no -q ./tests
 
 demo: rand
 	./rand
