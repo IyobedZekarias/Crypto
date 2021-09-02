@@ -7,5 +7,8 @@ tests: tests.cpp crypto.cpp
 test: tests
 	valgrind -q ./tests
 
+demo: rand
+	./rand
+
 clean:
 	rm -f *.o rand tests
