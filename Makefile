@@ -8,7 +8,7 @@ test: tests
 	valgrind --vgdb=no -q ./tests
 
 demo: rand
-	./rand
+	./rand 16 1 1 1 1 1
 
 clean:
 	rm -f *.o rand tests
