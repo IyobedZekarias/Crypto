@@ -126,7 +126,7 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 
 You will need to have some c++ compiler. 
-You can install the gnu gcc compiler on mac or clang on mac
+You can install the gnu gcc compiler on windows or clang on mac
 
 #### Windows
 Download WSL. Instructions here https://docs.microsoft.com/en-us/windows/wsl/install-win10
