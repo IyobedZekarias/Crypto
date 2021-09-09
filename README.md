@@ -60,16 +60,6 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
     </li>
     <li>
         <a href="#usage">Usage</a>
@@ -77,6 +67,13 @@
             <li><a href="Random">Random</a></li>
             <li><a href="XOR">XOR</a></li>
         </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
     </li>
     <!-- <li><a href="#roadmap">Roadmap</a></li> -->
     <!-- <li><a href="#contributing">Contributing</a></li> -->
@@ -100,9 +97,24 @@
 This is a library for cryptographic tools that are being made during CS350V-03 Banned Software. All of the code was/is being written by Iyobed Zekarias for educational purposes. 
 
 
-### Built With
+<!-- USAGE EXAMPLES -->
+## Usage
 
-* [](C++)
+#### Random
+
+#### XOR
+XOR is a weak cipher to secure a message using a key. XOR will, as the name signifies, xor a key and a binary file and store the results into an output file. For the best cipher the key and the message in the input file should both be the same length. For examle, if the binary file contains 0A 1F 4B the key should look something like 1B5CAF. 
+
+##### Run
+* Make the executable
+ ```sh
+ make xor
+ ```
+* To see a demo
+ ```sh
+ make p=xor demo
+ ```
+
 
 
 
@@ -120,10 +132,10 @@ You can install the gnu gcc compiler on mac or clang on mac
 Download WSL. Instructions here https://docs.microsoft.com/en-us/windows/wsl/install-win10
 Open WSL and run the following commands
 * gcc
-  ```sh
-  sudo apt-get update
-  sudo apt-get install build-essential manpages-dev
-  ```
+ ```sh
+ sudo apt-get update
+ sudo apt-get install build-essential manpages-dev
+ ```
 
 * verify
  ```sh
@@ -156,28 +168,6 @@ Follow installation directions
    make demo
    ```
 
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-#### Random
-
-#### XOR
-XOR is a weak cipher to secure a message using a key. XOR will, as the name signifies, xor a key and a binary file and store the results into an output file. For the best cipher the key and the message in the input file should both be the same length. For examle, if the binary file contains 0A 1F 4B the key should look something like 1B5CAF. 
-
-##### Run
-* Make the executable
- ```sh
- make xor
- ```
-* To see a demo
- ```sh
- make p=xor demo
- ```
-
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 
 
