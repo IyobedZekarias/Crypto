@@ -64,8 +64,8 @@
     <li>
         <a href="#usage">Usage</a>
         <ul>
-            <li><a href="Random">Random</a></li>
-            <li><a href="XOR">XOR</a></li>
+            <li><a href="#Random">Random</a></li>
+            <li><a href="#XOR">XOR</a></li>
         </ul>
     </li>
     <li>
