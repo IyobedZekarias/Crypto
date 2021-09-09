@@ -165,7 +165,7 @@ Follow installation directions
    ```
 2. Build
    ```sh
-   make demo
+   make
    ```
 
 

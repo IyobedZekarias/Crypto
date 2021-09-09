@@ -1,5 +1,7 @@
 CPPFLAGS = -g -std=gnu++17 -Wall -Wextra -Wold-style-cast -Werror -Wshadow -Wconversion -mrdseed -mrdrnd -maes -msha
 
+all: xor rand tests
+
 xor: xor.cpp crypto_xor.cpp crypto.cpp
 
 rand: rand.cpp crypto.cpp
