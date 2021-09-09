@@ -103,7 +103,7 @@ This is a library for cryptographic tools that are being made during CS350V-03 B
 #### Random
 
 #### XOR
-XOR is a weak cipher to secure a message using a key. XOR will, as the name signifies, xor a key and a binary file and store the results into an output file. For the best cipher the key and the message in the input file should both be the same length. For examle, if the binary file contains 0A 1F 4B the key should look something like 1B5CAF. 
+XOR is a weak cipher to secure a message using a key. XOR will, as the name signifies, xor a key and a binary file and store the results into an output file. For the best cipher the key and the message in the input file should both be the same length. For examle, if the binary file contains 0A 1F 4B the key should look something like 1B5CAF. For this example, the XOR algorithm will do these steps, 0A ⊕ 1B, 1F ⊕ 5C, then 4B ⊕ AF, which will give the result 11 43 e4.
 
 ##### Run
 * Make the executable
@@ -114,6 +114,10 @@ XOR is a weak cipher to secure a message using a key. XOR will, as the name sign
  ```sh
  make p=xor demo
  ```
+
+* To run
+ ```sh
+ ./xor <key> <input> <output>
 
 
 
