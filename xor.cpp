@@ -19,7 +19,9 @@ int main(int argc, char** argv){
     write(fd, &(buffer[0]), buffer.size()*sizeof(buffer[0]));
     
     //run the xor 
-    XOR(argv[1], argv[2], argv[3]); 
+    buffer_t key_v;
+    ToBuffer(argv[1], key_v); 
+    XOR(key_v, argv[2], argv[3]); 
 
     std::ifstream inFile (argv[2], std::ios::in | std::ios::binary);
     std::ifstream outFile (argv[3], std::ios::in | std::ios::binary);  

@@ -1,16 +1,3 @@
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Thanks again! Now go create something AMAZING! :D
-***
-***
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** github_username, repo_name, twitter_handle, email, project_title, project_description
--->
-
-
 
 <!-- PROJECT SHIELDS -->
 <!--
@@ -105,6 +92,12 @@ This is a library for cryptographic tools that are being made during CS350V-03 B
 #### XOR
 XOR is a weak cipher to secure a message using a key. XOR will, as the name signifies, xor a key and a binary file and store the results into an output file. For the best cipher the key and the message in the input file should both be the same length. For examle, if the binary file contains 0A 1F 4B the key should look something like 1B5CAF. For this example, the XOR algorithm will do these steps, 0A ⊕ 1B, 1F ⊕ 5C, then 4B ⊕ AF, which will give the result 11 43 e4.
 
+There are four options for the XOR function 
+1. Read from a file, XOR with the key, then write to a file
+2. Read from a buffer, XOR with the key, then write to a file
+3. Read from a buffer, XOR with the key, then write to a buffer
+4. Read from a file, XOR with the key, then write to a buffer
+
 ##### Run
 * Make the executable
  ```sh
@@ -118,7 +111,7 @@ XOR is a weak cipher to secure a message using a key. XOR will, as the name sign
 * To run
  ```sh
  ./xor <key> <input> <output>
-
+ ```
 
 
 
