@@ -148,7 +148,7 @@ The state is combined with the first round key using a bitwise xor.
 
 * To run
  ```sh
- ./aes <key file> <input file> <output file> <\"encode\" | \"decode\">
+ ./aes <key file> <input file> <output file> <"encode" | "decode">
  ```
 
 <!-- GETTING STARTED -->
