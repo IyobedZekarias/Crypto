@@ -53,6 +53,7 @@
         <ul>
             <li><a href="#Random">Random</a></li>
             <li><a href="#XOR">XOR</a></li>
+            <li><a href="#AES">AES</a></li>
         </ul>
     </li>
     <li>
@@ -113,7 +114,42 @@ There are four options for the XOR function
  ./xor <key> <input> <output>
  ```
 
+#### AES
+The Advanced Encryption Standard (AES) is a block cipher that was established by NIST in 2001. AES has been approved by the NSA for top secret information. This implementation of AES is using the 128 bit version which means it uses a 128 bit key to do the encrypting. This code uses the intel AES intrinsics that are built into most chips that intel makes. AES will only work with plaintext (data to encrypt) that has a lenght in bytes that is a multiple of 16. Therefore this algorithm uses "padding method 2" in ISO/IEC 9797-1. Which means it adds a 0x80 byte followed by as many 0x00 bytes as needed to reach a length of a multiple of 16.  
 
+##### Steps in AES
+###### Key Expansion
+Round keys are derived from the key that was input into the system. The AES schedule is what is used to derive the round keys and for AES-128 10 round keys are made. 
+
+###### Initial Round Key Addition
+The state is combined with the first round key using a bitwise xor. 
+
+###### 9 Rounds Process
+1. SubBytes: Bytes are subsituted and replaced according to a lookup table
+2. ShiftRows: Bytes are transposed and moved in the horizontal direction
+3. MixColumns: Four bytes in each column are combined and mixed
+4. AddRoundKey
+
+###### Final Round 
+1. SubBytes
+2. ShiftRows
+3. AddRoundKey
+----Mix Columns is unnecessary in the final round
+
+##### Run
+* Make the executable
+ ```sh
+ make aes
+ ```
+* To see a demo
+ ```sh
+ make p=aes demo
+ ```
+
+* To run
+ ```sh
+ ./aes <key file> <input file> <output file> <\"encode\" | \"decode\">
+ ```
 
 <!-- GETTING STARTED -->
 ## Getting Started

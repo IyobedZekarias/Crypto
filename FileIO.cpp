@@ -37,4 +37,11 @@ namespace crypto {
             buffer.push_back(byte); 
         }
     }
+
+    void MakeBinFile(char * fileName, size_t bytes){
+        buffer_t buffer; 
+        LCG(bytes, buffer); 
+
+        writeFile(fileName, buffer); 
+    }
 }

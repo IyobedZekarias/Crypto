@@ -18,6 +18,12 @@ std::ostream & operator<<(std::ostream &out,const crypto::buffer_t &buffer) {
 
 namespace crypto {
 
+    int Check_CPU_support_RDSEED()  { 
+        unsigned int a,b,c,d; 
+        cpuid(1, a,b,c,d); 
+        return (b & bit_RDSEED); 
+    }
+
    //Accessing urandom and copying from file into buffer
    bool urand(size_t bytes,buffer_t &buffer){
         std::ifstream urandom("/dev/urandom", std::ios::in|std::ios::binary);

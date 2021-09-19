@@ -6,80 +6,90 @@
 using namespace crypto;
 using namespace std;
 
-bool XORchecker(char fileName[], std::vector<u_char> &fill){
-    std::ifstream file (fileName, std::ios::in | std::ios::binary);
-    if(file){
-            std::cout << "open " << std::string(fileName) << " file check successful" << std::endl;
-            file.seekg(0, file.end);
-            long int filelength = file.tellg(); 
-            file.seekg(0, file.beg); 
-            fill.resize(static_cast<size_t>(filelength));
-
-            if(!file.read(reinterpret_cast<char*>(&fill[0]), filelength)) return false; 
-            std::cout << "file " << std::string(fileName) << " read successful" << std::endl;
-            file.close();  
-            
-            std::cout << "Contents of " << std::string(fileName) << std::endl;
-            for(auto x : fill){ std::cout << std::uppercase << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(x) << ' '; }
-            std::cout << std::endl << std::endl; 
-
-            return true;
-
-    } else {std::cout << "opening " << std::string(fileName) << " file unsuccessful" << std::endl; return false;}
+bool compareBuffers(buffer_t f_buffer, buffer_t s_buffer, std::string test){
+    if(f_buffer.size() == s_buffer.size()){
+            for(struct {std::vector<u_char>::const_iterator i; std::vector<u_char>::const_iterator j;} s = {f_buffer.begin(), s_buffer.begin()}; 
+                    s.i != f_buffer.end(); ++s.i, ++s.j){
+                        if(*s.i != *s.j) {
+                            std::cout << test << " FAILED:" << std::endl;
+                            std::cout << f_buffer << std::endl;
+                            std::cout << "and " << std::endl;
+                            std::cout << s_buffer << std::endl;
+                            std::cout << "are not equal" << std::endl; 
+                            return false;
+                        }
+                    }
+            std::cout << ".";
+            return true; 
+    } else {
+        std::cout << std::uppercase << std::string(test) << " FAILED:" << std::endl;
+        std::cout << f_buffer << std::endl;
+        std::cout << "and " << std::endl;
+        std::cout << s_buffer << std::endl;
+        std::cout << "are not equal" << std::endl; 
+        return false;
+    }
 }
-
-
 
 int main()
 {
+    {
+        std::cout << "RANDOM NUMBER TEST¯¯";
+        buffer_t buffer; 
+        int bytes = 4; 
 
-    std::cout << "STARTING RANDOM NUMBER TEST\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯" <<std::endl;
-    buffer_t buffer; 
-    int bytes = 4; 
-    if(!urand(bytes, buffer)) std::cout << "urand failed" <<std::endl;
-    else if(!rdrand(bytes, buffer)) std::cout << "rdrand failed" <<std::endl;
-    //else if(!rdseed(bytes, buffer)) std::cout << "rdseed failed" <<std::endl;
-    else if(!randDev(bytes, buffer)) std::cout << "randdev failed" <<std::endl;
-    else if(!LCG(bytes, buffer)) std::cout << "LCG failed" <<std::endl;
-    else cout << "all random tests passed" << std::endl << std::endl;
+        assert(urand(bytes, buffer));
+        std::cout << ".";
+        assert(rdrand(bytes, buffer));
+        std::cout << ".";
+        if(Check_CPU_support_RDSEED()){
+            assert(rdseed(bytes, buffer)); 
+            std::cout << ".";
+        } 
+        assert(randDev(bytes, buffer));
+        std::cout << ".";
+        assert(LCG(bytes, buffer));
+        std::cout << ".";
+        cout << "✓" << std::endl;
+    }
+    {
+        std::cout << "XOR TEST¯¯";
 
-    std::cout << "STARTING XOR TEST\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯" <<std::endl;
-    char key[] = "00FFAFF";
-    char in[] = "in_test.bin";
-    char out[] = "out_test.bin";
-    char in_checker[] = "in_test_checker.bin"; 
+        buffer_t key, in, out, inChecker; 
+        urand(8, key); 
+        urand(8, in); 
 
-    std::cout << "Key for testing xor is: " << std::string(key) << std::endl << std::endl; 
+        assert(XOR(key, in, out));
+        std::cout << ".";
 
-    std::vector<u_char> in_v, out_v, inChecker_v; 
+        assert(XOR(key, out, inChecker)); 
+        std::cout << ".";
 
-    assert(XORchecker(in, in_v));
+        assert(compareBuffers(in, inChecker, "XOR"));
+        std::cout << ".✓" << std::endl;
+    }
+    {
+        std::cout << "AES TEST¯¯"; 
+        buffer_t key = {0x54, 0x68, 0x61, 0x74, 0x73, 0x20, 0x6D, 0x79, 0x20, 0x4B, 0x75, 0x6E, 0x67, 0x20, 0x46, 0x75};
+        buffer_t plaintext = {0x54, 0x77, 0x6F, 0X20, 0X4F, 0X6E, 0X65, 0X20, 0X4E, 0X69, 0X6E, 0X65, 0X20, 0X54, 0X77, 0X6F};
+        buffer_t cipher = {0x29, 0xC3, 0X50, 0X5F, 0X57, 0X14, 0X20, 0XF6, 0X40, 0X22, 0X99, 0XB3, 0X1A, 0X02, 0XD7, 0X3A}; 
+        buffer_t computed_cipher; 
+        buffer_t computed_plain; 
 
-    assert(XOR(key, in, out));
-    std::cout << "file " << std::string(out) << " creation and xor successful" << std::endl;
+        if(Check_CPU_support_AES()){
+            assert(encode_aes128_ecb(plaintext, key, computed_cipher)); 
+            std::cout << "."; 
+            assert(compareBuffers(computed_cipher, cipher, "AES ENCRYPTION TEST")); 
+            std::cout << "."; 
+            assert(decode_aes128_ecb(cipher, key, computed_plain));
+            std::cout << "."; 
+            assert(compareBuffers(plaintext, computed_plain, "AES DECRYPTION TEST")); 
+            std::cout << ".✓" << std::endl;
+        }
+    }
 
-    assert(XORchecker(out, out_v));
-
-    assert(XOR(key, out, in_checker)); 
-    std::cout << "file " << std::string(in_checker) << " creation and xor successful" << std::endl;
-
-    assert(XORchecker(in_checker, inChecker_v)); 
-
-    if(in_v.size() == inChecker_v.size()){
-        std::cout << std::string(in) << "     " << std::string(in_checker) << std::endl;
-        for(struct {std::vector<u_char>::const_iterator i; std::vector<u_char>::const_iterator j;} s = {in_v.begin(), inChecker_v.begin()}; 
-                s.i != in_v.end(); ++s.i, ++s.j){
-                    if(*s.i != *s.j) {std::cout << "XOR failed " << std::string(in) << " and " << std::string(in_checker) << "are not equal" << std::endl; return 0;}
-                    else std::cout << std::uppercase << std::setw(2) << std::setfill('0') << std::hex << "    " << static_cast<int>(*s.i) << "                  " << static_cast<int>(*s.j) << std::endl;
-                }
-        std::cout << "Conents of the two files match!!" << std::endl;
-
-    } else std::cout << "XOR failed " << std::string(in) << " and " << std::string(in_checker) << "are not equal" << std::endl;
 
     return 0;
-
-
-
 
 }
 
