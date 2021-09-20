@@ -44,7 +44,7 @@ int main(int argc, char** argv){
         readFile(argv[2], cipher);
         decode_aes128_ecb(cipher, key, plaintext); 
 
-        writeFile(argv[3], cipher); 
+        writeFile(argv[3], plaintext); 
     }
     
 }
