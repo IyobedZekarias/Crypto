@@ -27,9 +27,13 @@ namespace crypto {
     int Check_CPU_support_RDSEED(); /*
         bit 18 in the ebx register has to be turned on intel chips
     */
+    int Check_CPU_support_RDRAND();/*
+        bit 30 in the ecx register has to be turned on intel chips
+    */
     int Check_CPU_support_AES(); /*
         bit 18 in the ebx register has to be turned on intel chips
     */
+   
 
     bool urand(size_t bytes,buffer_t &buffer);/*
         urand will take a number of bytes as the argument and will return a buffer

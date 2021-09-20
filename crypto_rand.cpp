@@ -23,6 +23,11 @@ namespace crypto {
         cpuid(1, a,b,c,d); 
         return (b & bit_RDSEED); 
     }
+    int Check_CPU_support_RDRAND()  { 
+        unsigned int a,b,c,d; 
+        cpuid(1, a,b,c,d); 
+        return (c & bit_RDRND); 
+    }
 
    //Accessing urandom and copying from file into buffer
    bool urand(size_t bytes,buffer_t &buffer){
