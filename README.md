@@ -143,6 +143,9 @@ The state is combined with the first round key using a bitwise xor.
  ```
 * To see a demo
  ```sh
+ make file
+ ./file 16 key
+ ./file <preferred length in bytes> plaintext
  make p=aes demo
  ```
 
