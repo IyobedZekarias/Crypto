@@ -16,8 +16,8 @@ file: file.cpp crypto_rand.cpp FileIO.cpp
 
 aes: aes.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
 
-# demo: xor
-# 	./aes key plaintext ciphertext plaintext2
+# demo: aes
+# 	./aes key plaintext ciphertext demo
 
 demo:
 ifeq ($(p),xor)
