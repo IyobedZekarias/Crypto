@@ -19,15 +19,21 @@ aes: aes.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
 # demo: aes
 # 	./aes key plaintext ciphertext demo
 
+#running instructions make p=<option> demo
 demo:
 ifeq ($(p),xor)
+	@make xor
 	./xor 00FFAFF in.bin out.bin
 else
 ifeq ($(p),rand)
+	@make rand
 	./rand 16 1 1 1 1 1
 else
 ifeq ($(p),aes)
+	@make aes
 	./aes key plaintext ciphertext demo
+else
+	@echo "usage: make p=<option> demo\n      options: xor, rand, aes"
 endif
 endif
 endif
