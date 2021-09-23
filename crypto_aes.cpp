@@ -96,12 +96,12 @@ namespace crypto {
             l = plain.size() / 16 + 1; 
             cipher.resize(plain.size() + (16-(plain.size()%16)));  
             std::copy(plain.begin(), plain.end(), std::back_inserter(plain_b));
-            plain_b.push_back(0x80); 
-            plain_b.resize(plain.size() + (16-(plain.size()%16)), 0x00);  
+            plain_b.resize(plain.size() + (16-(plain.size()%16)), static_cast<u_int8_t>(16-(plain.size() % 16))); 
         } else {
-            l = plain.size()/16;
+            l = plain.size()/16 + 1;
             plain_b = plain; 
-        }        
+            plain_b.resize(plain.size() + (16), static_cast<u_int8_t>(16)); 
+        }   
 
         u_char cipher_c[cipher.size()];
         const u_char *plain_c = &plain_b[0];
@@ -134,13 +134,9 @@ namespace crypto {
 
         plain.assign(plain_c, plain_c+cipher.size()); 
 
-        for(auto i = plain.rbegin(); i != plain.rend(); ++i){
-            if(*i == 0x00) 
-                plain.erase((i + 1).base());  
-            else if(*i == 0x80){
-                plain.erase((i + 1).base()); 
-                break;
-            } else break;
+        u_int8_t padding = *plain.rbegin(); 
+        for(auto i = plain.rbegin(); i != plain.rend(), padding > 0; ++i, padding--){
+            plain.erase((i+1).base()); 
         }   
 
         return true; 
