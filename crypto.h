@@ -137,6 +137,26 @@ namespace crypto {
             buffer before filling it
         decode will return false if cpu does not support intel aes intrinsics
     */
+
+    bool encode_aes128_cbc(const buffer_t &plain, buffer_t key, buffer_t &cipher, buffer_t &IV);/*
+        encode aes cbc is like aes encode ecb but it takes an initial value (IV) as an argument and 
+            XORs the initial value with the first block of the plaintext and XORs the first block of the ciphertext
+            with the next block of the plain text and so on
+        If you do not specify the value of the IV then the IV will be randomly computed, to do this pass an empty vector into 
+            IV and it will be populated with random values 
+        You should then save the values of IV somewhere as you will need it for decoding
+        NOTE: If IV has values in it and is not equal to the size of a block (16 bytes) then the function will return false
+
+    */
+
+
+    bool decode_aes128_cbc(const buffer_t &plain, buffer_t key, buffer_t &cipher, buffer_t &IV);/*
+        decode aes cbc is like decode aes ecb but it takes a n initial value (IV)
+        This IV has to be the same IV that was used in the encoding process, otherwise the computed plaintext will not 
+            have the expected value 
+        If you did not save the IV after encoding tough luck
+        NOTE: If IV does not have a size of one block (16 bytes) the function will return false
+    */
     
 };
 

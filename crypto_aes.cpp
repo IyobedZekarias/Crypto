@@ -73,6 +73,88 @@ void aes128_load_key(const unsigned char *userkey, block_t *key_schedule) {
     key_schedule[19] = _mm_aesimc_si128(key_schedule[1]);
 }   
 
+bool encode_aes128(const buffer_t &plain, buffer_t key, buffer_t &cipher, buffer_t IV){
+    cipher.clear(); 
+    unsigned char *user_key = &key[0]; 
+    cipher.resize(plain.size()); 
+    block_t key_schedule[20]; 
+    aes128_load_key(user_key, key_schedule);
+
+    buffer_t plain_b; 
+    size_t l; 
+    if(plain.size() % 16){
+        l = plain.size() / 16 + 1; 
+        cipher.resize(plain.size() + (16-(plain.size()%16)));  
+        std::copy(plain.begin(), plain.end(), std::back_inserter(plain_b));
+        plain_b.resize(plain.size() + (16-(plain.size()%16)), static_cast<u_int8_t>(16-(plain.size() % 16))); 
+    } else {
+        l = plain.size()/16 + 1;
+        plain_b = plain; 
+        plain_b.resize(plain.size() + (16), static_cast<u_int8_t>(16)); 
+    }   
+
+    u_char cipher_c[plain_b.size()];
+    u_char *plain_c = &plain_b[0];
+    for(size_t i = 0; i < l; i++){
+        if(IV.size()){
+            size_t j = i * 16; 
+            for(size_t k = 0; k < 16; k++, j++){
+                plain_c[j] = plain_c[j] ^ IV[k]; 
+            }
+        }
+        block_t m = _mm_loadu_si128(&(reinterpret_cast<const block_t*>(plain_c))[i]); 
+        DO_ENC_BLOCK(m, key_schedule); 
+        _mm_storeu_si128(&(reinterpret_cast<block_t*>(cipher_c))[i], m); 
+        if(IV.size()){
+            size_t j = i * 16; 
+            for(size_t k = 0; k < 16; k++, j++){
+                IV[k] = cipher_c[j]; 
+            }
+        }
+    }
+    cipher.assign(cipher_c, cipher_c+plain_b.size()); 
+    return true; 
+}
+
+bool decode_aes128(const buffer_t &cipher, buffer_t key,buffer_t &plain, buffer_t IV){
+    plain.clear(); 
+    unsigned char *user_key = &key[0]; 
+    plain.resize(cipher.size()); 
+    block_t key_schedule[20]; 
+    aes128_load_key(user_key, key_schedule); 
+
+
+    const u_char *cipher_c = &cipher[0];
+    u_char plain_c[cipher.size()];
+    buffer_t IV2; 
+    for(size_t i = 0; i < (cipher.size()/16); i++){
+        if(IV.size()){ 
+            for(size_t j = i*16; j < (i*16)+16; j++){
+                IV2.push_back(cipher_c[j]); 
+            }
+        }
+        block_t m = _mm_loadu_si128(&(reinterpret_cast<const block_t*>(cipher_c))[i]); 
+        DO_DEC_BLOCK(m, key_schedule); 
+        _mm_storeu_si128(&(reinterpret_cast<block_t*>(plain_c))[i], m); 
+        if(IV.size()){
+            size_t j = i * 16; 
+            for(size_t k = 0; k < 16; k++, j++){
+                plain_c[j] = plain_c[j] ^ IV[k]; 
+            }
+            IV=IV2; 
+            IV2.clear(); 
+        }
+    }
+
+    plain.assign(plain_c, plain_c+cipher.size()); 
+
+    u_int8_t padding = *plain.rbegin(); 
+    for(auto i = plain.rbegin(); i != plain.rend(), padding > 0; ++i, padding--){
+        plain.erase((i+1).base()); 
+    }   
+
+    return true; 
+}
 
 namespace crypto {
 
@@ -84,62 +166,26 @@ namespace crypto {
 
     bool encode_aes128_ecb(const buffer_t &plain, buffer_t key, buffer_t &cipher){
         if(!Check_CPU_support_AES()) return false; 
-        cipher.clear(); 
-        unsigned char *user_key = &key[0]; 
-        cipher.resize(plain.size()); 
-        block_t key_schedule[20]; 
-        aes128_load_key(user_key, key_schedule);
+        buffer_t IV; 
+        return encode_aes128(plain, key, cipher, IV); 
+    }
 
-        buffer_t plain_b; 
-        size_t l; 
-        if(plain.size() % 16){
-            l = plain.size() / 16 + 1; 
-            cipher.resize(plain.size() + (16-(plain.size()%16)));  
-            std::copy(plain.begin(), plain.end(), std::back_inserter(plain_b));
-            plain_b.resize(plain.size() + (16-(plain.size()%16)), static_cast<u_int8_t>(16-(plain.size() % 16))); 
-        } else {
-            l = plain.size()/16 + 1;
-            plain_b = plain; 
-            plain_b.resize(plain.size() + (16), static_cast<u_int8_t>(16)); 
-        }   
-
-        u_char cipher_c[cipher.size()];
-        const u_char *plain_c = &plain_b[0];
-        for(size_t i = 0; i < l; i++){
-            block_t m = _mm_loadu_si128(&(reinterpret_cast<const block_t*>(plain_c))[i]); 
-            DO_ENC_BLOCK(m, key_schedule); 
-            _mm_storeu_si128(&(reinterpret_cast<block_t*>(cipher_c))[i], m); 
-        }
-        
-        cipher.assign(cipher_c, cipher_c+plain_b.size()); 
-        return true; 
+    bool encode_aes128_cbc(const buffer_t &plain, buffer_t key, buffer_t &cipher, buffer_t &IV){
+        if(!Check_CPU_support_AES()) return false; 
+        if(!IV.size()) rdrand(16, IV);
+        else if(IV.size() != 16) return false;
+        return encode_aes128(plain, key, cipher, IV); 
     }
 
     bool decode_aes128_ecb(const buffer_t &cipher, buffer_t key,buffer_t &plain){
         if(!Check_CPU_support_AES()) return false; 
-        plain.clear(); 
-        unsigned char *user_key = &key[0]; 
-        plain.resize(cipher.size()); 
-        block_t key_schedule[20]; 
-        aes128_load_key(user_key, key_schedule); 
+        buffer_t IV; 
+        return decode_aes128(cipher, key, plain, IV); 
+    }   
 
-
-        const u_char *cipher_c = &cipher[0];
-        u_char plain_c[cipher.size()];
-        for(size_t i = 0; i < (cipher.size()/16); i++){
-            block_t m = _mm_loadu_si128(&(reinterpret_cast<const block_t*>(cipher_c))[i]); 
-            DO_DEC_BLOCK(m, key_schedule); 
-            _mm_storeu_si128(&(reinterpret_cast<block_t*>(plain_c))[i], m); 
-        }
-
-        plain.assign(plain_c, plain_c+cipher.size()); 
-
-        u_int8_t padding = *plain.rbegin(); 
-        for(auto i = plain.rbegin(); i != plain.rend(), padding > 0; ++i, padding--){
-            plain.erase((i+1).base()); 
-        }   
-
-        return true; 
+    bool decode_aes128_cbc(const buffer_t &cipher, buffer_t key,buffer_t &plain, buffer_t &IV){
+        if(!Check_CPU_support_AES()) return false; 
+        if(IV.size() != 16) return false; 
+        return decode_aes128(cipher, key, plain, IV); 
     }
-
 }

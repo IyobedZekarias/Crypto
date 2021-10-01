@@ -14,14 +14,17 @@ test: tests
 
 file: file.cpp crypto_rand.cpp FileIO.cpp
 
-aes: aes.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
+aesecb: aesecb.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
+
+aescbc: aescbc.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
+
 
 # demo: aes
 # 	./aes key plaintext ciphertext demo
 
 #running instructions make p=<option> demo
 demo:
-ifeq ($(p),xor)
+ifeq ($(p),xor)    
 	@make xor
 	./xor 00FFAFF in.bin out.bin
 else
@@ -29,14 +32,19 @@ ifeq ($(p),rand)
 	@make rand
 	./rand 16 1 1 1 1 1
 else
-ifeq ($(p),aes)
-	@make aes
-	./aes key plaintext ciphertext demo
+ifeq ($(p),aesecb)
+	@make aesecb
+	./aesecb key plaintext ciphertext demo
 else
-	@echo "usage: make p=<option> demo\n      options: xor, rand, aes"
+ifeq ($(p),aescbc)
+	@make aescbc
+	./aescbc key plaintext ciphertext demo
+else
+	@echo "usage: make p=<option> demo\n      options: xor, rand, aesecb, aescbc"
+endif
 endif
 endif
 endif
 
 clean:
-	rm -f *.o rand tests xor file aes
+	rm -f *.o rand tests xor aescbc aesecb
