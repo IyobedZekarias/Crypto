@@ -6,7 +6,7 @@ using namespace std;
 
 int main(int argc, char** argv){
     if(argc < 4){
-        std::cout << "Usage: " << std::string(argv[0]) << "<input file> <output file> <\"512\" | \"512/t\">\n    where `t` is the number of bits you would like returned -- must be between 100 and 512 inclusive" << std::endl; 
+        std::cout << "Usage: " << std::string(argv[0]) << " <input file> <output file> <\"512\" | \"512/t\">\n    where `t` is the number of bits you would like returned -- must be between 100 and 512 inclusive" << std::endl; 
         return 0; 
     }
 

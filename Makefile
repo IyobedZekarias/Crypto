@@ -42,11 +42,11 @@ ifeq ($(p),aescbc)
 else
 ifeq ($(p),sha)
 	@make sha
-	./sha plaintext ciphertext demo
+	./sha plaintext hashtext demo
 else
 ifeq ($(p),shat)
 	@make sha
-	./sha plaintext ciphertext demo t
+	./sha plaintext hashtext demo t
 else
 	@echo "usage: make p=<options> demo\n      options: xor, rand, aesecb, aescbc, sha"
 endif
