@@ -117,6 +117,9 @@ There are four options for the XOR function
 #### AES
 The Advanced Encryption Standard (AES) is a block cipher that was established by NIST in 2001. AES has been approved by the NSA for top secret information. This implementation of AES is using the 128 bit version which means it uses a 128 bit key to do the encrypting. This code uses the intel AES intrinsics that are built into most chips that intel makes. AES will only work with plaintext (data to encrypt) that has a length in bytes that is a multiple of 16. Therefore, the padding on this algorithm is that it finds the number of bytes that it needs to add for the message to have a lenght that is a multiple of 16, n, and appends the n repeating to the end of the message until the length is the required length. 
 
+##### ECB vs. CBC
+ECB and CBC are two different methods of running AES. CBC makes it to where bits in a plaintext block only affect the bits in the corresponding ciphertext block. This can cause issues in images or files where data is read in 64bits. ECB on the other hand is a little more secure in that every block in the plaintext affects every block in the ciphertext. This is achieved by XORing the result of one block cipher with the next plaintext block before encoding the next block. ECB takes an initial value (IV) as a parameter to XOR the first plaintext block. The IV is needed to decode the cipher text so it is appended onto the end of the cipher text. 
+
 ##### Steps in AES
 ###### Key Expansion
 Round keys are derived from the key that was input into the system. The AES schedule is what is used to derive the round keys and for AES-128 10 round keys are made. 
