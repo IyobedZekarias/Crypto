@@ -44,7 +44,12 @@ ifeq ($(p),sha)
 	@make sha
 	./sha plaintext ciphertext demo
 else
-	@echo "usage: make p=<option> demo\n      options: xor, rand, aesecb, aescbc"
+ifeq ($(p),shat)
+	@make sha
+	./sha plaintext ciphertext demo t
+else
+	@echo "usage: make p=<options> demo\n      options: xor, rand, aesecb, aescbc, sha"
+endif
 endif
 endif
 endif
@@ -52,4 +57,4 @@ endif
 endif
 
 clean:
-	rm -f *.o rand tests xor aescbc aesecb
+	rm -f *.o rand tests xor aescbc aesecb sha

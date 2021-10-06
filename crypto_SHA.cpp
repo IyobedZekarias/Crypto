@@ -49,6 +49,8 @@ bool thash(const buffer_t &plain,hash_t &hash, hash_t h, int &t, bool mod){
         SHA512V.push_back(digits[hund]); 
         SHA512V.push_back(digits[tens]); 
         SHA512V.push_back(digits[ones]); 
+        s = SHA512V.size() * 8;
+        SHA512V.resize(SHA512V.size() + (8-(SHA512V.size()%8)));
         const buffer_t ConstSHA512V = SHA512V; 
         bool additional = ConstSHA512V.size()%8; 
         const uint64_t *p = reinterpret_cast<const uint64_t*>(&ConstSHA512V[0]); 
@@ -56,10 +58,14 @@ bool thash(const buffer_t &plain,hash_t &hash, hash_t h, int &t, bool mod){
         for(int i = 0; i < n+additional; i++){
             plain_h.push_back(p[i]);
         }
-        s = ConstSHA512V.size() * 8; 
     } else {
         bool additional = plain.size()%8; 
-        const uint64_t *p = reinterpret_cast<const uint64_t*>(&plain[0]); 
+        buffer_t plain_copy;
+        std::copy_n(plain.begin(), plain.size(), std::back_inserter(plain_copy));
+        if(additional){
+            plain_copy.resize(plain.size() + (8-(plain.size()%8)));
+        }
+        const uint64_t *p = reinterpret_cast<const uint64_t*>(&plain_copy[0]); 
         uint64_t n = static_cast<uint64_t>(ceil(plain.size() / sizeof(p[0]))); 
         for(int i = 0; i < n+additional; i++){
             plain_h.push_back(p[i]);
@@ -70,6 +76,7 @@ bool thash(const buffer_t &plain,hash_t &hash, hash_t h, int &t, bool mod){
     for(auto i = plain_h.begin(); i != plain_h.end(); ++i){
         *i = __builtin_bswap64(*i);
     }
+     
     
     if((plain_h.size())%16){
         if((s/8)%8) 
@@ -84,7 +91,6 @@ bool thash(const buffer_t &plain,hash_t &hash, hash_t h, int &t, bool mod){
         plain_h.push_back(static_cast<uint64_t>(s >> 64));  
         plain_h.push_back(s & 0xffffffffffffffff);
     }
-
 
     if(mod){
         for(auto i = h.begin(); i != h.end(); ++i){
@@ -187,7 +193,6 @@ bool thash(const buffer_t &plain,hash_t &hash, hash_t h, int &t, bool mod){
         hash = h; 
     } else {
         hash = h; 
-        std::cout << h; 
     }
 
     return true;  

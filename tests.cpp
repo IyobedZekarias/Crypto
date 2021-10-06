@@ -49,7 +49,7 @@ int main()
         cout << ".";
         assert(randDev(bytes, buffer));
         cout << ".";
-        //assert(LCG(bytes, buffer));
+        // assert(LCG(bytes, buffer));
         cout << ".";
         cout << setw(5) << setfill('.') << "✅";
         if(!Check_CPU_support_RDSEED()) cout << "-SYSTEM DOES NOT SUPPORT RDSEED"; 
@@ -112,17 +112,35 @@ int main()
         } else cout << setw(20) << setfill('.') << "❌" << "-CPU DOES NOT SUPPORT AES" << endl;
     }
     {
-        cout << "SHA512--"; 
+        cout << "SHA-512--"; 
         buffer_t plaintext = {0x61, 0x62, 0x63}; 
         buffer_t Writtenhash = {0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31, 0x12, 0xe6,
                                 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2, 0x0a, 0x9e, 0xee, 0xe6, 0x4b, 0x55, 0xd3, 0x9a, 0x21, 0x92, 0x99, 0x2a,
                                 0x27, 0x4f, 0xc1, 0xa8, 0x36, 0xba, 0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd, 0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 
                                 0xe8, 0x0e, 0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f};
         buffer_t computedHash; 
-        computedHash.resize(Writtenhash.size()); 
         assert(hash_sha512(plaintext, computedHash, 0));
         cout << ".";
-        //assert(compareBuffers(computedHash, Writtenhash, "SHA512 HASHING TEST"));
+        assert(compareBuffers(computedHash, Writtenhash, "SHA512 HASHING TEST"));
+        cout << setw(19) << setfill('.') << ".✅" << endl;
+    }
+    {
+        cout << "SHA-512/256--"; 
+        buffer_t plaintext(112); 
+        const std::vector<uint64_t> plaintext64 = {__builtin_bswap64(0x6162636465666768), __builtin_bswap64(0x6263646566676869), __builtin_bswap64(0x636465666768696A), __builtin_bswap64(0x6465666768696A6B),
+                                             __builtin_bswap64(0x65666768696A6B6C), __builtin_bswap64(0x666768696A6B6C6D), __builtin_bswap64(0x6768696A6B6C6D6E), __builtin_bswap64(0x68696A6B6C6D6E6F),
+                                             __builtin_bswap64(0x696A6B6C6D6E6F70), __builtin_bswap64(0x6A6B6C6D6E6F7071), __builtin_bswap64(0x6B6C6D6E6F707172), __builtin_bswap64(0x6C6D6E6F70717273),
+                                             __builtin_bswap64(0x6D6E6F7071727374), __builtin_bswap64(0x6E6F707172737475)};
+        const uint8_t *p = reinterpret_cast<const uint8_t*>(&plaintext64[0]); 
+        uint8_t n = static_cast<uint8_t>(plaintext64.size() * 8); 
+        std::copy(p, p+n, plaintext.begin()); 
+        buffer_t Writtenhash = {0x39, 0x28, 0xE1, 0x84, 0xFB, 0x86, 0x90, 0xF8, 0x40, 0xDA, 
+                                0x39, 0x88, 0x12, 0x1D, 0x31, 0xBE, 0x65, 0xCB, 0x9D, 0x3E, 
+                                0xF8, 0x3E, 0xE6, 0x14, 0x6F, 0xEA, 0xC8, 0x61, 0xE1, 0x9B, 0x56, 0x3A};
+        buffer_t computedHash; 
+        assert(hash_sha512(plaintext, computedHash, 256));
+        cout << ".";
+        assert(compareBuffers(computedHash, Writtenhash, "SHA512 HASHING TEST"));
         cout << setw(15) << setfill('.') << ".✅" << endl;
     }
 
