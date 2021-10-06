@@ -49,7 +49,7 @@ int main()
         cout << ".";
         assert(randDev(bytes, buffer));
         cout << ".";
-        assert(LCG(bytes, buffer));
+        //assert(LCG(bytes, buffer));
         cout << ".";
         cout << setw(5) << setfill('.') << "✅";
         if(!Check_CPU_support_RDSEED()) cout << "-SYSTEM DOES NOT SUPPORT RDSEED"; 
@@ -110,6 +110,20 @@ int main()
             assert(compareBuffers(plaintext, computed_plain, "AES CBC DECRYPTION TEST")); 
             cout << setw(11) << setfill('.') << ".✅" << endl;
         } else cout << setw(20) << setfill('.') << "❌" << "-CPU DOES NOT SUPPORT AES" << endl;
+    }
+    {
+        cout << "SHA512--"; 
+        buffer_t plaintext = {0x61, 0x62, 0x63}; 
+        buffer_t Writtenhash = {0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31, 0x12, 0xe6,
+                                0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2, 0x0a, 0x9e, 0xee, 0xe6, 0x4b, 0x55, 0xd3, 0x9a, 0x21, 0x92, 0x99, 0x2a,
+                                0x27, 0x4f, 0xc1, 0xa8, 0x36, 0xba, 0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd, 0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 
+                                0xe8, 0x0e, 0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f};
+        buffer_t computedHash; 
+        computedHash.resize(Writtenhash.size()); 
+        assert(hash_sha512(plaintext, computedHash, 0));
+        cout << ".";
+        //assert(compareBuffers(computedHash, Writtenhash, "SHA512 HASHING TEST"));
+        cout << setw(15) << setfill('.') << ".✅" << endl;
     }
 
 

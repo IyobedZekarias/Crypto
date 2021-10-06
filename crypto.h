@@ -16,6 +16,8 @@
 #define _CRYPTO_H
 
 namespace crypto {
+    typedef __int128 int128_t;
+    typedef unsigned __int128 uint128_t;
     using buffer_t = std::vector<uint8_t>;
 
     #define cpuid(func,ax,bx,cx,dx)\
@@ -156,6 +158,15 @@ namespace crypto {
             have the expected value 
         If you did not save the IV after encoding tough luck
         NOTE: If IV does not have a size of one block (16 bytes) the function will return false
+    */
+
+    bool hash_sha512(const buffer_t &plain,buffer_t &hash, int t);/*
+        This function utilizes both SHA2 512 SHA2 512/t
+        A buffer with the plain text will be taken as the first argument
+        The second argument should be an empty buffer that will be filled 
+        The final argument for t is the amount of bits that should be truncated off of the hashed value 
+            the rule fo t is that it should be between 100 and 512 inclusive
+        If you want to do just use SHA512 without truncating any values leave t as 0
     */
     
 };
