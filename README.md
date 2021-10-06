@@ -115,7 +115,7 @@ There are four options for the XOR function
  ```
 
 #### AES
-The Advanced Encryption Standard (AES) is a block cipher that was established by NIST in 2001. AES has been approved by the NSA for top secret information. This implementation of AES is using the 128 bit version which means it uses a 128 bit key to do the encrypting. This code uses the intel AES intrinsics that are built into most chips that intel makes. AES will only work with plaintext (data to encrypt) that has a lenght in bytes that is a multiple of 16. Therefore this algorithm uses "padding method 2" in ISO/IEC 9797-1. Which means it adds a 0x80 byte followed by as many 0x00 bytes as needed to reach a length of a multiple of 16.  
+The Advanced Encryption Standard (AES) is a block cipher that was established by NIST in 2001. AES has been approved by the NSA for top secret information. This implementation of AES is using the 128 bit version which means it uses a 128 bit key to do the encrypting. This code uses the intel AES intrinsics that are built into most chips that intel makes. AES will only work with plaintext (data to encrypt) that has a length in bytes that is a multiple of 16. Therefore, the padding on this algorithm is that it finds the number of bytes that it needs to add for the message to have a lenght that is a multiple of 16, n, and appends the n repeating to the end of the message until the length is the required length. 
 
 ##### Steps in AES
 ###### Key Expansion
@@ -137,9 +137,10 @@ The state is combined with the first round key using a bitwise xor.
 ----Mix Columns is unnecessary in the final round
 
 ##### Run
+###### AESECB
 * Make the executable
  ```sh
- make aes
+ make aesecb
  ```
 * To see a demo
  ```sh
@@ -151,7 +152,25 @@ The state is combined with the first round key using a bitwise xor.
 
 * To run
  ```sh
- ./aes <key file> <input file> <output file> <"encode" | "decode">
+ ./aesecb <key file> <input file> <output file> <"encode" | "decode">
+ ```
+
+ ###### AESCBC
+* Make the executable
+ ```sh
+ make aescbc
+ ```
+* To see a demo
+ ```sh
+ make file
+ ./file 16 key
+ ./file <preferred length of bytes> plaintext
+ make p=aes demo
+ ```
+
+* To run
+ ```sh
+ ./aescbc <key file> <input file> <output file> <"encode" | "decode">
  ```
 
 <!-- GETTING STARTED -->
