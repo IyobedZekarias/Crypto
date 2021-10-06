@@ -88,9 +88,9 @@ This is a library for cryptographic tools that are being made during CS350V-03 B
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-#### Random
+### Random
 
-#### XOR
+### XOR
 XOR is a weak cipher to secure a message using a key. XOR will, as the name signifies, xor a key and a binary file and store the results into an output file. For the best cipher the key and the message in the input file should both be the same length. For examle, if the binary file contains 0A 1F 4B the key should look something like 1B5CAF. For this example, the XOR algorithm will do these steps, 0A ⊕ 1B, 1F ⊕ 5C, then 4B ⊕ AF, which will give the result 11 43 e4.
 
 There are four options for the XOR function 
@@ -114,7 +114,7 @@ There are four options for the XOR function
  ./xor <key> <input> <output>
  ```
 
-#### AES
+### AES
 The Advanced Encryption Standard (AES) is a block cipher that was established by NIST in 2001. AES has been approved by the NSA for top secret information. This implementation of AES is using the 128 bit version which means it uses a 128 bit key to do the encrypting. This code uses the intel AES intrinsics that are built into most chips that intel makes. AES will only work with plaintext (data to encrypt) that has a length in bytes that is a multiple of 16. Therefore, the padding on this algorithm is that it finds the number of bytes that it needs to add for the message to have a lenght that is a multiple of 16, n, and appends the n repeating to the end of the message until the length is the required length. 
 
 ##### ECB vs. CBC
