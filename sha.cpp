@@ -16,7 +16,7 @@ int main(int argc, char** argv){
             readFile(argv[1], plaintext);  
 
             hash_sha512(plaintext, hash, 256);
-            
+            std::cout << hash; 
             writeFile(argv[2], hash); 
         }else{
             readFile(argv[1], plaintext);  
@@ -36,11 +36,15 @@ int main(int argc, char** argv){
         
     }
     else if(argv[3][3] == '/'){
-        int t = (static_cast<int>(argv[3][4])*100) + (static_cast<int>(argv[3][5])*10) + static_cast<int>(argv[3][6]); 
+        // int t = (static_cast<int>(argv[3][4])*100) + (static_cast<int>(argv[3][5])*10) + static_cast<int>(argv[3][6]); 
+        // std::cout << (static_cast<int>(argv[3][3])*100); 
+        // if(t < 100 || t > 512){
+        //     std::cout << "t must be between 100 and 512 inclusive" << std::endl;
+        // }
         buffer_t plaintext, hash; 
         readFile(argv[1], plaintext);  
 
-        hash_sha512(plaintext, hash, t);
+        hash_sha512(plaintext, hash, 256);
         
         writeFile(argv[2], hash); 
         

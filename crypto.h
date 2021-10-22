@@ -11,6 +11,7 @@
 #include <wmmintrin.h>
 #include <cpuid.h> 
 #include <bitset>
+#include <cassert>
 
 #ifndef _CRYPTO_H
 #define _CRYPTO_H
@@ -19,6 +20,20 @@ namespace crypto {
     typedef __int128 int128_t;
     typedef unsigned __int128 uint128_t;
     using buffer_t = std::vector<uint8_t>;
+    
+
+    typedef struct RSApublic64 {
+        uint32_t e = 0; 
+        uint128_t n; 
+    } RSApublic64;
+
+    typedef struct RSAprivate64 { 
+        uint128_t d;
+        uint64_t p = 0; 
+        uint64_t q = 0;
+        uint128_t n;
+        uint128_t phi;
+    } RSAprivate64; 
 
     #define cpuid(func,ax,bx,cx,dx)\
      __asm__ __volatile__ ("cpuid":\
@@ -169,9 +184,41 @@ namespace crypto {
         If you want to do just use SHA512 without truncating any values leave t as 0
     */
     
+    bool generate_rsa64(RSAprivate64 &key, RSApublic64 &pub);/*
+    
+        Uses Rabin-Miller primality test implementation from tutorialspoint
+            https://www.tutorialspoint.com/cplusplus-program-to-implement-the-rabin-miller-primality-test-to-check-if-a-given-number-is-prime
+        This function will generate two prime number nad multiply them together to make an 
+            n value. This n value will be put into the public key and the p and q primes will be saved 
+            in the private key 
+        Additionally (p-1) * (q-1) = phi. Phi will be saved in the private key
+        The function will use 65537 as the value for e that will be in the public key
+        Using the Extended Euclidean Algorithm the d value will also be generated such that 
+            ed = 1 mod phi
+        
+        In summary the public key will contain 
+            e = 65537 and n 
+        And the private key will contain 
+            prime p, prime q, phi = (p-1) * (q-1), and d = e^-1 modp phi, and n (for convenience)
+        
+    */
+    bool encode_rsa64(const buffer_t message, buffer_t &cipher, const RSApublic64 &pub); /*
+        encode rsa will use a simple algorithm to encode a message
+        the only constraint is that the numeric representation of the message has to be 
+            smaller than the value of pub.n
+        The function will put the ciphered message back into cipher
+        The RSApublic key will have to have been generated with generate_rsa
+    */
+    bool decode_rsa64(buffer_t &message, const buffer_t cipher, const RSAprivate64 &key);/*
+        decoe will take a cipher that was made by enocde then will decode it
+        The RSAprivate key will have to have been generated with generate_rsa
+    */
+
 };
 
 std::ostream & operator<<(std::ostream &out,const crypto::buffer_t &buffer);
+std::ostream & operator<<(std::ostream &out,const crypto::RSApublic64 &pub);
+std::ostream & operator<<(std::ostream &out,const crypto::RSAprivate64 &priv);
 
 
 #endif

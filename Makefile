@@ -1,5 +1,5 @@
 #CPPFLAGS = -g -std=gnu++17 -Wall -Wextra -Wold-style-cast -Werror -Wshadow -Wconversion -mrdseed -mrdrnd -maes -msha
-CPPFLAGS = -g -std=gnu++17 -Wold-style-cast -Werror -Wshadow -Wconversion -mrdseed -mrdrnd -maes -msha -fno-builtin
+CPPFLAGS = -g -std=gnu++17 -Wold-style-cast -Werror -Wconversion -Wshadow -mrdseed -mrdrnd -maes -msha -fno-builtin
 
 all: xor rand tests aes
 
@@ -7,7 +7,7 @@ xor: xor.cpp crypto_xor.cpp crypto_rand.cpp FileIO.cpp
 
 rand: rand.cpp crypto.cpp
 
-tests: tests.cpp crypto_xor.cpp crypto_rand.cpp FileIO.cpp crypto_aes.cpp crypto_SHA.cpp
+tests: tests.cpp crypto_xor.cpp crypto_rand.cpp FileIO.cpp crypto_aes.cpp crypto_SHA.cpp crypto_RSA.cpp
 
 test: tests
 	valgrind --vgdb=no -q --track-origins=yes ./tests
@@ -19,6 +19,8 @@ aesecb: aesecb.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
 aescbc: aescbc.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
 
 sha: sha.cpp crypto_SHA.cpp FileIO.cpp crypto_rand.cpp
+
+rsa: rsa.cpp crypto_rsa.cpp crypto_rand.cpp FileIO.cpp
 # demo: aes
 # 	./aes key plaintext ciphertext demo
 
@@ -48,7 +50,12 @@ ifeq ($(p),shat)
 	@make sha
 	./sha plaintext hashtext demo t
 else
+ifeq ($(p),rsa)
+	@make rsa
+	./rsa plaintext ciphertext
+else
 	@echo "usage: make p=<options> demo\n      options: xor, rand, aesecb, aescbc, sha"
+endif
 endif
 endif
 endif
@@ -57,4 +64,4 @@ endif
 endif
 
 clean:
-	rm -f *.o rand tests xor aescbc aesecb sha
+	rm -f *.o rand tests xor aescbc aesecb sha rsa

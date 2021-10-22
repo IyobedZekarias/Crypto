@@ -180,7 +180,7 @@ The state is combined with the first round key using a bitwise xor.
 SHA is a hashing algorithm that is used to encrypt a message to an irreversible, compressed state. Unlike AES or other cipher algorithms SHA will not have a key nor will it be decode-able. Additionally unlike a cipher, SHA returns a fixed length for any input. This is done by splitting the message into blocks and having the result of one block be half of the input for hashing the next block.
 
 ##### SHA2-512 vs. SHA2-512/t
-SHA2-512 returns a block that is 512 bits long. The issue with SHA2-512 is that it is vulnerable to length extension attacks. To combat this SHA2-512/t was created. SHA2-512/t where t is a number of bits, turnactes t bits from the result of an SHA2-512 modified hash. The recommended amount of bits to turncate is 256 and 224. The length of the final hash will be 512-t bits long. 
+SHA2-512 returns a block that is 512 bits long. The issue with SHA2-512 is that it is vulnerable to length extension attacks. To combat this SHA2-512/t was created. SHA2-512/t where t is a number of bits, turnactes t bits from the result of an SHA2-512 modified hash. t must be between 100 and 512 inclusive. The recommended amount of bits to turncate is 256 and 224. The length of the final hash will be 512 - t bits long. 
 
 ##### Run
 * Make the executable
@@ -195,6 +195,7 @@ SHA2-512 returns a block that is 512 bits long. The issue with SHA2-512 is that 
 * To run
  ```sh
  ./sha <input file> <output file> <"512" | "512/t">
+          where t is the number of bits to be turncated
  ```
 
 <!-- GETTING STARTED -->

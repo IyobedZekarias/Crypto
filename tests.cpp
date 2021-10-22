@@ -143,6 +143,33 @@ int main()
         assert(compareBuffers(computedHash, Writtenhash, "SHA512 HASHING TEST"));
         cout << setw(15) << setfill('.') << ".✅" << endl;
     }
+    {
+        RSAprivate64 priv; 
+        RSApublic64 pub; 
+        pub.e = 3; 
+        priv.p = 173; 
+        priv.q = 149;
+        generate_rsa64(priv, pub); 
+        cout << '.'; 
+        assert(pub.n == 25777); 
+        cout << '.';
+        assert(pub.e = 3); 
+        cout << '.';
+        assert(priv.d = 16971); 
+        cout << '.';
+        buffer_t message = {0x3f, 0x3b}; 
+        buffer_t cipher = {0x2d, 0x56};
+        buffer_t computed_cipher; 
+        buffer_t computed_message; 
+        assert(encode_rsa64(message, computed_cipher, pub));
+        cout << '.';
+        assert(compareBuffers(computed_cipher, cipher, "RSA ENCODING TEST")); 
+        cout << '.';
+        assert(decode_rsa64(computed_message, cipher, priv)); 
+        cout << '.';
+        assert(compareBuffers(computed_message, message, "RSA DECODE TEST")); 
+
+    }
 
 
     return 0;
