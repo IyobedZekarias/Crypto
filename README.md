@@ -54,8 +54,8 @@
             <li><a href="#Random">Random</a></li>
             <li><a href="#XOR">XOR</a></li>
             <li><a href="#AES">AES</a></li>
-            <li><a href="#SHA">AES</a></li>
-            <li><a href="#RSA">AES</a></li>
+            <li><a href="#SHA">SHA</a></li>
+            <li><a href="#RSA">RSA</a></li>
         </ul>
     </li>
     <li>
@@ -198,6 +198,25 @@ SHA2-512 returns a block that is 512 bits long. The issue with SHA2-512 is that 
  ```sh
  ./sha <input file> <output file> <"512" | "512/t">
           where t is the number of bits to be turncated
+ ```
+
+### RSA
+
+
+
+##### Run
+* Make the executable
+ ```sh
+ make rsa
+ ```
+* To see a demo
+ ```sh
+ make p=rsa demo
+ ```
+
+* To run
+ ```sh
+
  ```
 
 <!-- GETTING STARTED -->
