@@ -54,6 +54,8 @@
             <li><a href="#Random">Random</a></li>
             <li><a href="#XOR">XOR</a></li>
             <li><a href="#AES">AES</a></li>
+            <li><a href="#SHA">AES</a></li>
+            <li><a href="#RSA">AES</a></li>
         </ul>
     </li>
     <li>
