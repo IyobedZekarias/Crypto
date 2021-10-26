@@ -53,7 +53,7 @@
   <p align="center">
     A Library Filled with Cryptographic Tools
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/Lipscomb-CCT/crypto-IyobedZekarias"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="#Usage">View Demo</a>
