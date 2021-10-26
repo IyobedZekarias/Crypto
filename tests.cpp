@@ -144,6 +144,7 @@ int main()
         cout << setw(15) << setfill('.') << ".✅" << endl;
     }
     {
+        cout << "RSA TEST--"; 
         RSAprivate64 priv; 
         RSApublic64 pub; 
         pub.e = 3; 
@@ -168,6 +169,7 @@ int main()
         assert(decode_rsa64(computed_message, cipher, priv)); 
         cout << '.';
         assert(compareBuffers(computed_message, message, "RSA DECODE TEST")); 
+        cout << setw(11) << setfill('.') << "✅" << endl; 
 
     }
 

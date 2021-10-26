@@ -1,5 +1,6 @@
 #include "crypto.h"
 
+
 #define RSAbits 64
 
 std::ostream & operator<<(std::ostream &out,const crypto::RSApublic64 &pub){
@@ -189,35 +190,33 @@ namespace crypto {
 
       bool encode_rsa64(const buffer_t message, buffer_t &cipher, const RSApublic64 &pub){
          if(message.size() > 8) return false; 
-         const uint128_t* m = reinterpret_cast<const uint128_t*>(&message[0]); 
-         if(m[0] >= pub.n) return false; 
+         //const uint128_t* m = reinterpret_cast<const uint128_t*>(&message[0]); 
+         uint128_t m = 0;
+         std::memcpy(&m, &message[0], sizeof(message[0]) * message.size()); 
+         if(m >= pub.n) return false; 
 
-         uint128_t c = modular_pow(m[0], pub.e, pub.n); 
+         uint128_t c = modular_pow(m, pub.e, pub.n); 
          // const uint64_t* p = reinterpret_cast<const uint64_t*>(&c);
          // const uint64_t* q = reinterpret_cast<const uint64_t*>(&m[0]);
          // std::cout << std::dec << q[0] << std::endl;
          // std::cout << p[0] << ' ' << p[1] << std::endl;
          const uint8_t* cip = reinterpret_cast<const uint8_t*>(&c); 
          cipher = std::vector<uint8_t>(cip, cip + sizeof(cip)/sizeof(cip[0])); 
-         size_t j = cipher.size(); 
-         for(auto i = cipher.rbegin(); i != cipher.rend() && j > message.size(); i++, j--){
-            cipher.erase(std::next(i).base()); 
-         }
+         cipher.resize(message.size()); 
          return true; 
       }
 
 
        bool decode_rsa64(buffer_t &message, const buffer_t cipher, const RSAprivate64 &key){
-         const uint128_t* c = reinterpret_cast<const uint128_t*>(&cipher[0]);
+         uint128_t c = 0; 
+         std::memcpy(&c, &cipher[0], sizeof(cipher[0]) * cipher.size()); 
+         //const uint128_t* c = reinterpret_cast<const uint128_t*>(&cipher[0]);
          //std::cout << c[0] << std::endl;
          
-         uint128_t m = modular_pow(c[0], key.d, key.n); 
+         uint128_t m = modular_pow(c, key.d, key.n); 
          const uint8_t* mes = reinterpret_cast<const uint8_t*>(&m); 
          message = std::vector<uint8_t>(mes, mes + sizeof(mes)/sizeof(mes[0])); 
-         size_t j = message.size(); 
-         for(auto i = message.rbegin(); i != message.rend() && j > cipher.size(); i++, j--){
-            message.erase(std::next(i).base()); 
-         }
+         message.resize(cipher.size()); 
          return true; 
       }
 };

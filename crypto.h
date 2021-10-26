@@ -12,6 +12,7 @@
 #include <cpuid.h> 
 #include <bitset>
 #include <cassert>
+#include <cstring>
 
 #ifndef _CRYPTO_H
 #define _CRYPTO_H
