@@ -68,6 +68,23 @@ This is a library for cryptographic tools that are being made during CS350V-03 B
 
 <!-- USAGE EXAMPLES -->
 ## Usage
+To use this library you will need to build it first. There are only a couple steps to build the library. 
+
+1. Make the object files
+```sh
+make objs
+```
+2. Make the shared library
+```sh
+make lib
+```
+3. Run any of the demo programs OR Create the actual programs
+```sh
+make p=<options> demo\n      options: xor, rand, aesecb, aescbc, sha
+```
+```sh
+make <option>\n      options: xor, rand, aesecb, aescbc, sha
+```
 
 ### Random
 

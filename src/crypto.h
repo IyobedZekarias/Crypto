@@ -14,8 +14,8 @@
 #include <cassert>
 #include <cstring>
 
-#ifndef _CRYPTO_H
-#define _CRYPTO_H
+#ifndef _CRYPTO_H__
+#define _CRYPTO_H__
 
 namespace crypto {
     typedef __int128 int128_t;

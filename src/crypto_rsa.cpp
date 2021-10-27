@@ -211,7 +211,6 @@ namespace crypto {
          uint128_t c = 0; 
          std::memcpy(&c, &cipher[0], sizeof(cipher[0]) * cipher.size()); 
          //const uint128_t* c = reinterpret_cast<const uint128_t*>(&cipher[0]);
-         //std::cout << c[0] << std::endl;
          
          uint128_t m = modular_pow(c, key.d, key.n); 
          const uint8_t* mes = reinterpret_cast<const uint8_t*>(&m); 

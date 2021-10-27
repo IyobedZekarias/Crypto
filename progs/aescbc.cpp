@@ -1,4 +1,4 @@
-#include "crypto.h"
+#include "../src/crypto.h"
 #include <cstring>
 
 using namespace crypto;
@@ -15,13 +15,17 @@ int main(int argc, char** argv){
         readFile(argv[1], key);
         readFile(argv[2], plaintext);  
 
-        encode_aes128_ecb(plaintext, key, cipher); 
+        buffer_t IV; 
+        encode_aes128_cbc(plaintext, key, cipher, IV); 
 
+        //cipher.resize(cipher.size() + IV.size()); 
+        cipher.insert(cipher.end(), IV.begin(), IV.end()); 
         writeFile(argv[3], cipher); 
+        cipher.resize(cipher.size() - 16); 
         plaintext.clear(); 
         plaintext.resize(0); 
 
-        decode_aes128_ecb(cipher, key, plaintext); 
+        decode_aes128_cbc(cipher, key, plaintext, IV); 
 
         std::string plainFile(argv[2]); 
         plainFile.append("2");
@@ -34,15 +38,26 @@ int main(int argc, char** argv){
         readFile(argv[1], key);
         readFile(argv[2], plaintext);  
 
-        encode_aes128_ecb(plaintext, key, cipher); 
+        buffer_t IV; 
+        encode_aes128_cbc(plaintext, key, cipher, IV);
 
+        cipher.insert(cipher.end(), IV.begin(), IV.end()); 
         writeFile(argv[3], cipher); 
     }
     else if(std::string(argv[4]) == "decode"){
         buffer_t key, plaintext, cipher; 
         readFile(argv[1], key);
         readFile(argv[2], cipher);
-        decode_aes128_ecb(cipher, key, plaintext); 
+        buffer_t IV; 
+
+        int IVsize = 16; 
+        for(auto i = cipher.rbegin(); i != cipher.rend(), IVsize > 0; ++i, IVsize--){
+            IV.push_back(*i); 
+            cipher.erase((i+1).base()); 
+        } 
+        std::reverse(IV.begin(), IV.end());  
+
+        decode_aes128_cbc(cipher, key, plaintext, IV); 
 
         writeFile(argv[3], plaintext); 
     }

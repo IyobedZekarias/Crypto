@@ -1,26 +1,134 @@
 #CPPFLAGS = -g -std=gnu++17 -Wall -Wextra -Wold-style-cast -Werror -Wshadow -Wconversion -mrdseed -mrdrnd -maes -msha
+
+LibFolder = bin
+LibName = crypto_iz
+ROOT_DIR:=$(abspath $(lastword $(MAKEFILE_LIST)))
+dir:=$(subst Makefile,$(LibFolder),$(ROOT_DIR))
+space := $(subst ,, )
+rmsp:=$(subst $(space),\$(space),$(dir))
+
 CPPFLAGS = -g -std=gnu++17 -Wold-style-cast -Werror -Wconversion -Wshadow -mrdseed -mrdrnd -maes -msha -fno-builtin
+Lib = -L$(rmsp) 
 
-all: xor rand tests aes
 
-xor: xor.cpp crypto_xor.cpp crypto_rand.cpp FileIO.cpp
+objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o
 
-rand: rand.cpp crypto.cpp
+lib: bin/crypto_xor.o bin/crypto_rand.o bin/crypto_aes.o bin/FileIO.o bin/crypto_sha.o bin/crypto_rsa.o
+	gcc -shared $^ -o bin/lib$(LibName).so
 
-tests: tests.cpp crypto_xor.cpp crypto_rand.cpp FileIO.cpp crypto_aes.cpp crypto_SHA.cpp crypto_RSA.cpp
+xor.o: src/crypto_xor.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
+
+rand.o: src/crypto_rand.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
+
+aes.o: src/crypto_aes.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
+
+FileIO.o: src/FileIO.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/$@
+
+rsa.o: src/crypto_rsa.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
+
+sha.o: src/crypto_sha.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
+
+
+
+PATH_TO_FILE = bin/lib$(LibName).so
+xor: progs/xor.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s xor.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+	
+
+rand: progs/rand.cpp 
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s rand.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+file: progs/file.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s FileIO.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+aes:
+	@echo "usage: you need to make either aesecb or aescbc"
+
+aesecb: progs/aesecb.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s aes.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+aescbc: progs/aescbc.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s aes.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+sha: progs/sha.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s sha.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+rsa: progs/rsa.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s rsa.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+tests: progs/tests.cpp 
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
 
 test: tests
 	valgrind --vgdb=no -q --track-origins=yes ./tests
-
-file: file.cpp crypto_rand.cpp FileIO.cpp
-
-aesecb: aesecb.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
-
-aescbc: aescbc.cpp crypto_aes.cpp FileIO.cpp crypto_rand.cpp
-
-sha: sha.cpp crypto_SHA.cpp FileIO.cpp crypto_rand.cpp
-
-rsa: rsa.cpp crypto_rsa.cpp crypto_rand.cpp FileIO.cpp
 # demo: aes
 # 	./aes key plaintext ciphertext demo
 
@@ -64,4 +172,4 @@ endif
 endif
 
 clean:
-	rm -f *.o rand tests xor aescbc aesecb sha rsa
+	rm -f bin/*.o bin/*.so rand tests xor aescbc aesecb sha rsa

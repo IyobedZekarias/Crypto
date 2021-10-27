@@ -40,7 +40,7 @@ namespace crypto {
 
     void MakeBinFile(char * fileName, size_t bytes){
         buffer_t buffer; 
-        LCG(bytes, buffer); 
+        rdrand(bytes, buffer); 
 
         writeFile(fileName, buffer); 
     }

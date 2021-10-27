@@ -1,7 +1,7 @@
 #include <cassert>
 #include <stdio.h>
 #include <iomanip>
-#include "crypto.h"
+#include "../src/crypto.h"
 
 using namespace crypto;
 using namespace std;
