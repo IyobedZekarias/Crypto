@@ -80,10 +80,12 @@ make lib
 ```
 3. Run any of the demo programs OR Create the actual programs
 ```sh
-make p=<options> demo\n      options: xor, rand, aesecb, aescbc, sha
+make p=<options> demo
+      options: xor, rand, aesecb, aescbc, sha
 ```
 ```sh
-make <option>\n      options: xor, rand, aesecb, aescbc, sha
+make <option>
+      options: xor, rand, aesecb, aescbc, sha
 ```
 
 ### Random
