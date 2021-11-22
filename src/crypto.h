@@ -1,3 +1,6 @@
+#ifndef _CRYPTO_H__
+#define _CRYPTO_H__
+
 #include <iostream>
 #include <random> 
 #include <math.h>
@@ -14,10 +17,13 @@
 #include <cassert>
 #include <cstring>
 
-#ifndef _CRYPTO_H__
-#define _CRYPTO_H__
-
 namespace crypto {
+    #define INT_ADD_OVERFLOW(a, b) \
+        __builtin_add_overflow_p (a, b, static_cast<__typeof__ ((a) + (b))>(0))
+
+     #define INT_SUB_OVERFLOW(a, b) \
+        __builtin_sub_overflow_p (a, b, static_cast<__typeof__ ((a) + (b))>(0))
+    
     typedef __int128 int128_t;
     typedef unsigned __int128 uint128_t;
     using buffer_t = std::vector<uint8_t>;

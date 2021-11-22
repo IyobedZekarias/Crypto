@@ -1,38 +1,43 @@
 #include "crypto.h"
+#include "NNI.h"
 
 
-#define RSAbits 64
+#define RSAbits 4096
 
-std::ostream & operator<<(std::ostream &out,const crypto::RSApublic64 &pub){
-   const uint64_t* n = reinterpret_cast<const uint64_t*>(&pub.n);
-   out << "n: " <<  n[0] << ' ' << n[1] << "\n"; 
-   out << "e: " << pub.e << "\n"; 
-   return out; 
-}
+// NNI * list = {
+//    NNI(""),
+// }; 
 
-std::ostream & operator<<(std::ostream &out,const crypto::RSAprivate64 &priv){
-   const uint64_t* n = reinterpret_cast<const uint64_t*>(&priv.n);
-   out << "n: " <<  n[0] << ' ' << n[1] << "\n"; 
-   out << "p: " << priv.p << "\n"; 
-   out << "q: " << priv.q << "\n"; 
-   const uint64_t* d = reinterpret_cast<const uint64_t*>(&priv.d);
-   out << "d: " <<  d[0] << ' ' << d[1] << "\n"; 
-   const uint64_t* phi = reinterpret_cast<const uint64_t*>(&priv.phi);
-   out << "phi: " <<  phi[0] << ' ' << phi[1] << "\n"; 
-   //out << "phi: " <<  priv.phi << "\n";
-   return out; 
-}
+// std::ostream & operator<<(std::ostream &out,const crypto::RSApublic64 &pub){
+//    const uint64_t* n = reinterpret_cast<const uint64_t*>(&pub.n);
+//    out << "n: " <<  n[0] << ' ' << n[1] << "\n"; 
+//    out << "e: " << pub.e << "\n"; 
+//    return out; 
+// }
+
+// std::ostream & operator<<(std::ostream &out,const crypto::RSAprivate64 &priv){
+//    const uint64_t* n = reinterpret_cast<const uint64_t*>(&priv.n);
+//    out << "n: " <<  n[0] << ' ' << n[1] << "\n"; 
+//    out << "p: " << priv.p << "\n"; 
+//    out << "q: " << priv.q << "\n"; 
+//    const uint64_t* d = reinterpret_cast<const uint64_t*>(&priv.d);
+//    out << "d: " <<  d[0] << ' ' << d[1] << "\n"; 
+//    const uint64_t* phi = reinterpret_cast<const uint64_t*>(&priv.phi);
+//    out << "phi: " <<  phi[0] << ' ' << phi[1] << "\n"; 
+//    //out << "phi: " <<  priv.phi << "\n";
+//    return out; 
+// }
 
 #define ll crypto::uint128_t
 using namespace std;
-ll mulmod(ll a, ll b, ll m){//It returns true if number is prime otherwise false {
-   ll x = 0,y = a % m;
-   while (b > 0) {
-      if (b % 2 == 1) {
+NNI mulmod(NNI a, NNI b, NNI m){//It returns true if number is prime otherwise false {
+   NNI x ,y = a % m;
+   while (b.size() > 0) {
+      if (b % NNI(2) == 1) {
          x = (x + y) % m;
       }
       y = (y * 2) % m;
-      b /= 2;
+      b = b / 2;
    }
    return x % m;
 }
@@ -49,25 +54,53 @@ ll modulo(ll base, ll e, ll m) {
    return x % m;
 }
 
-bool Miller(uint64_t p, int iteration) {
-   if (p < 2) {
+bool Miller(NNI p, int iteration) {
+   if (p < NNI(2)) {
       return false;
    }
-   if (p != 2 && p % 2==0) {
+   if (p != NNI(2) && p % NNI(2) == 0) {
       return false;
    }
-   ll s = p - 1;
-   while (s % 2 == 0) {
-      s /= 2;
+   NNI s = p - NNI(1);
+   while (s % NNI(2) == 0) {
+      s = s >> 1;
    }
    for (int i = 0; i < iteration; i++) {
-      ll a = rand() % (p - 1) + 1, temp = s;
-      ll mod = modulo(a, temp, p);
-      while (temp != p - 1 && mod != 1 && mod != p - 1) {
-         mod = mulmod(mod, mod, p);
-         temp *= 2;
+      NNI rnni; 
+      
+      // while(true){
+      //    rnni.randnni(p.size());
+      //    if(rnni < (p - NNI(1))) break; 
+      //    std::random_device rd;
+      //    std::uniform_int_distribution<int> roll(0,(p.size()*64));
+      //    while(rnni >= (p-NNI(1))){
+      //       int i = roll(rd);
+      //       rnni = rnni >> (i); 
+      //    }
+      //    if(rnni < (p - NNI(1)) && rnni > NNI(1)) break; 
+      // }
+      // std::cout << rnni << std::endl;
+      // std::cout << p << std::endl;
+      
+      // if(mod == 1 || mod == (p - NNI(1))) {i++; goto loop;} 
+      // for(int r = 0; r < sr-1; r++){
+      //    mod = modexp(mod, NNI(2), p); 
+      //    if(mod == 1) return false; 
+      //    if(mod == (p - NNI(1))) {i++; goto loop;} 
+      // }
+      // return false; 
+
+
+
+      rnni.randnni(p.size()); 
+      rnni = rnni % (p - NNI(1)); 
+      NNI d = s;
+      NNI mod = modexp(rnni, d, p);
+      while (d != p - NNI(1) && mod != NNI(1) && mod != p - NNI(1)) {
+         mod = modexp(mod, NNI(2), p);
+         d = d * NNI(2);
       }
-      if (mod != p - 1 && temp % 2 == 0) {
+      if (mod != p - NNI(1) && d % NNI(2) == 0) {
          return false;
       }
    }
@@ -146,38 +179,88 @@ crypto::uint128_t modular_pow(crypto::uint128_t b, crypto::uint128_t exp, crypto
 
 namespace crypto {
     bool generate_rsa64(RSAprivate64 &key, RSApublic64 &pub){
-      uint32_t e; 
-      if(pub.e){
-         e = pub.e;
-         goto genD;     
-      }
-      else e = 65537;   
+      NNI p, q;
+      p.randnni(32);
+      q.randnni(32);
+      if (p % NNI(2) == 0) p = p + NNI(1); 
+      if (q % NNI(2) == 0) q = q + NNI(1); 
+      for(;;){
+         // std::vector<uint64_t> rand = { 0xDA29C99B881A9A85, 0xC73CAB7C0BD64579, 0x3B4C25323B };
+         // buffer_t rand; 
+         // crypto::rdrand(8*4, rand); 
+         // rand.at(0) |= 1; 
+          
+         //std::cout << p << std::endl;
+         if(Miller(p, 40)){
+            // file.open("primes", std::ios::out| std::ios::binary | std::ios_base::app); 
+            std::cout << std::endl << p; 
+            break;
+            // file << p;
+            // file.close(); 
+            
+         } else {
+            std::cout << "." << std::flush;
+            p = p + NNI(2); 
+            
+         }
+      } 
 
-      restart: 
-      gennumber(key.p); 
-      if (!(key.p & 1))
-            key.p += 1;
-      while(true){
-         if(Miller(key.p, 40) && (key.p % e) != 1) break; 
-         else key.p += 2; 
+      for(;;){
+         // std::vector<uint64_t> rand = { 0xDA29C99B881A9A85, 0xC73CAB7C0BD64579, 0x3B4C25323B };
+         // buffer_t rand; 
+         // crypto::rdrand(8*4, rand); 
+         // rand.at(0) |= 1; 
+          
+         //std::cout << p << std::endl;
+         if(Miller(q, 40)){
+            // file.open("primes", std::ios::out| std::ios::binary | std::ios_base::app); 
+            std::cout << std::endl << q; 
+            break;
+            // file << p;
+            // file.close(); 
+            
+         } else {
+            std::cout << "." << std::flush;
+            q = q + NNI(2); 
+            
+         }
       }
+      
+      // NNI p(dig4); 
+      // std::cout << p << std::endl;
+      // std::cout << Miller(p, 40) << std::endl;
+      // uint32_t e; 
+      // if(pub.e){
+      //    e = pub.e;
+      //    goto genD;     
+      // }
+      // else e = 65537;   
 
-      gennumber(key.q); 
-      if (!(key.q & 1))
-            key.q += 1;
-      while(true){
-         if(Miller(key.q, 40) && (key.q % e) != 1) break; 
-         key.q += 2;
-      }
+      // restart: 
+      // gennumber(key.p); 
+      // if (!(key.p & 1))
+      //       key.p += 1;
+      // while(true){
+      //    if(Miller(key.p, 40) && (key.p % e) != 1) break; 
+      //    else key.p += 2; 
+      // }
 
-      genD:
-      uint128_t n = key.p * key.q; 
-      uint128_t phi = (key.p-1) * (key.q-1); 
-      key.d = mul_inv(e, phi); 
-      pub.n = n; 
-      pub.e = e;
-      key.n = n;
-      key.phi = phi;  
+      // gennumber(key.q); 
+      // if (!(key.q & 1))
+      //       key.q += 1;
+      // while(true){
+      //    if(Miller(key.q, 40) && (key.q % e) != 1) break; 
+      //    key.q += 2;
+      // }
+
+      // genD:
+      // uint128_t n = key.p * key.q; 
+      // uint128_t phi = (key.p-1) * (key.q-1); 
+      // key.d = mul_inv(e, phi); 
+      // pub.n = n; 
+      // pub.e = e;
+      // key.n = n;
+      // key.phi = phi;  
       // std::cout << "private: \n" << key; 
       // std::cout << "public: \n" << pub; 
       // std::cout << key.p << "\n" << key.q << "\n" << d[0] << "\n" << pub.e << std::endl;

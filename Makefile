@@ -7,14 +7,17 @@ dir:=$(subst Makefile,$(LibFolder),$(ROOT_DIR))
 space := $(subst ,, )
 rmsp:=$(subst $(space),\$(space),$(dir))
 
-CPPFLAGS = -g -std=gnu++17 -Wold-style-cast -Werror -Wconversion -Wshadow -mrdseed -mrdrnd -maes -msha -fno-builtin
-Lib = -L$(rmsp) 
+#CPPFLAGS = -g -std=gnu++17 -Wold-style-cast -Werror -Wconversion -Wshadow -mrdseed -mrdrnd -maes -msha -fno-builtin
+CPPFLAGS = -g -std=gnu++17 -mrdseed -mrdrnd -maes -msha
+Lib = -L$(rmsp)
 
 
-objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o
+objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o NNI.o
 
-lib: bin/crypto_xor.o bin/crypto_rand.o bin/crypto_aes.o bin/FileIO.o bin/crypto_sha.o bin/crypto_rsa.o
-	gcc -shared $^ -o bin/lib$(LibName).so
+lib: bin/crypto_xor.o bin/crypto_rand.o bin/crypto_aes.o \
+bin/FileIO.o bin/crypto_sha.o bin/crypto_rsa.o bin/NNI.o
+	g++ -shared $^ -o bin/lib$(LibName).so  $(Lib) -Wl,-rpath=$(rmsp) -Wl,--whole-archive -lfftw3l -Wl,--no-whole-archive
+# $(Lib) -Wl,-rpath=$(rmsp) -Wl,--whole-archive -lfftw3f -Wl,--no-whole-archive
 
 xor.o: src/crypto_xor.cpp
 	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
@@ -33,6 +36,9 @@ rsa.o: src/crypto_rsa.cpp
 
 sha.o: src/crypto_sha.cpp
 	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
+
+NNI.o: src/NNI.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/$@
 
 
 
@@ -109,7 +115,19 @@ endif
 
 rsa: progs/rsa.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s NNI.o
 	@make -s rsa.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+nni: progs/nni.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s NNI.o
 	@make -s lib
 	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
@@ -120,14 +138,14 @@ endif
 
 tests: progs/tests.cpp 
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName) 
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName) 
 endif
 
-test: tests
+test: tests 
 	valgrind --vgdb=no -q --track-origins=yes ./tests
 # demo: aes
 # 	./aes key plaintext ciphertext demo

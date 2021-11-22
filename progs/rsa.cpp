@@ -21,12 +21,12 @@ int main(int argc, char** argv)
     // std::cout << pub; 
     // std::cout << priv; 
 
-    buffer_t message; 
-    buffer_t cipher; 
-    readFile(argv[1], message);
-    //std::cout << message << std::endl; 
-    assert(encode_rsa64(message, cipher, pub)); 
-    assert(decode_rsa64(message, cipher, priv));
+    // buffer_t message; 
+    // buffer_t cipher; 
+    // readFile(argv[1], message);
+    // //std::cout << message << std::endl; 
+    // assert(encode_rsa64(message, cipher, pub)); 
+    // assert(decode_rsa64(message, cipher, priv));
     //std::cout << message; 
 
 
