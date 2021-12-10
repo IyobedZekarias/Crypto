@@ -1,13 +1,11 @@
+#ifndef _NNI_H__
+#define _NNI_H__
 #include "limits.h"
 #include <iomanip>
 #include <stdexcept>
 #include <tgmath.h>
 #include <exception>
 #include "crypto.h"
-
-
-#ifndef _NNI_H__
-#define _NNI_H__
 
 class NNI {
 private: 
@@ -24,8 +22,9 @@ public:
     NNI(b_digit_t num); 
     NNI(crypto::buffer_t buf); 
     NNI(digit_t n);
-    NNI(const char * str, int string); 
+    NNI(const char * str, int string=1); 
     NNI(); 
+    crypto::buffer_t toBuffer() const; 
     
     //void divideby2();
     // NNI(const std::string &str);
@@ -49,7 +48,6 @@ public:
     friend NNI operator/=(const NNI &u,const NNI &v);
     friend NNI operator%(const NNI &u,const NNI &v);
     friend NNI operator%=(const NNI &u,const NNI &v);
-    friend NNI expmod(const NNI &a,const NNI &e,const NNI &b);
     NNI operator=(const digit_t &v);
     NNI operator=(const b_digit_t &v);
 

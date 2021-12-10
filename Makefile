@@ -8,14 +8,14 @@ space := $(subst ,, )
 rmsp:=$(subst $(space),\$(space),$(dir))
 
 #CPPFLAGS = -g -std=gnu++17 -Wold-style-cast -Werror -Wconversion -Wshadow -mrdseed -mrdrnd -maes -msha -fno-builtin
-CPPFLAGS = -g -std=gnu++17 -mrdseed -mrdrnd -maes -msha
+CPPFLAGS = -g -std=gnu++17 -mrdseed -mrdrnd -maes -msha -fpermissive
 Lib = -L$(rmsp)
 
 
-objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o NNI.o
+objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o NNI.o dh.o
 
 lib: bin/crypto_xor.o bin/crypto_rand.o bin/crypto_aes.o \
-bin/FileIO.o bin/crypto_sha.o bin/crypto_rsa.o bin/NNI.o
+bin/FileIO.o bin/crypto_sha.o bin/crypto_rsa.o bin/NNI.o bin/crypto_dh.o
 	g++ -shared $^ -o bin/lib$(LibName).so  $(Lib) -Wl,-rpath=$(rmsp) -Wl,--whole-archive -lfftw3l -Wl,--no-whole-archive
 # $(Lib) -Wl,-rpath=$(rmsp) -Wl,--whole-archive -lfftw3f -Wl,--no-whole-archive
 
@@ -39,6 +39,9 @@ sha.o: src/crypto_sha.cpp
 
 NNI.o: src/NNI.cpp
 	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/$@
+
+dh.o: src/crypto_dh.cpp
+	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
 
 
 
@@ -128,6 +131,17 @@ endif
 nni: progs/nni.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s NNI.o
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+else
+	@make -s objs
+	@make -s lib
+	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+endif
+
+dh: progs/dh.cpp
+ifneq ("$(wildcard $(PATH_TO_FILE))","")
+	@make -s dh.o
 	@make -s lib
 	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else

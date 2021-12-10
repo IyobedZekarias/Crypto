@@ -22,7 +22,7 @@ std::ostream & operator<<(std::ostream &out,const crypto::RSAprivate64 &priv){
    //out << "phi: " <<  priv.phi << "\n";
    return out; 
 }
-
+//TODO: get rid of #define
 #define ll crypto::uint128_t
 using namespace std;
 ll mulmod(ll a, ll b, ll m){//It returns true if number is prime otherwise false {
@@ -153,7 +153,6 @@ namespace crypto {
       }
       else e = 65537;   
 
-      restart: 
       gennumber(key.p); 
       if (!(key.p & 1))
             key.p += 1;
@@ -207,7 +206,7 @@ namespace crypto {
       }
 
 
-       bool decode_rsa64(buffer_t &message, const buffer_t cipher, const RSAprivate64 &key){
+      bool decode_rsa64(buffer_t &message, const buffer_t cipher, const RSAprivate64 &key){
          uint128_t c = 0; 
          std::memcpy(&c, &cipher[0], sizeof(cipher[0]) * cipher.size()); 
          //const uint128_t* c = reinterpret_cast<const uint128_t*>(&cipher[0]);

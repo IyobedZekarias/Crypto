@@ -148,6 +148,8 @@ bool decode_aes128(const buffer_t &cipher, buffer_t key,buffer_t &plain, buffer_
 
     plain.assign(plain_c, plain_c+cipher.size()); 
 
+
+    //TODO: fix padding issue: not verifying padding
     u_int8_t padding = *plain.rbegin(); 
     for(auto i = plain.rbegin(); i != plain.rend(), padding > 0; ++i, padding--){
         plain.erase((i+1).base()); 

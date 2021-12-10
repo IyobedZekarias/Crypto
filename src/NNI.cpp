@@ -1,8 +1,6 @@
-#include "NNI.h"
+#include "crypto.h"
 #include "fftw3.h"
-
-#define REAL 0
-#define IMAG 1
+using namespace crypto; 
 
 class myexception: public std::exception
 {
@@ -12,7 +10,7 @@ class myexception: public std::exception
   }
 } Subtraction;
 
-
+namespace crypto{
 
 void NNI::DeleteZeros(){
     for(auto i = nni.rbegin(); i != nni.rend(); i++){
@@ -65,6 +63,13 @@ NNI::NNI(crypto::buffer_t buf){
     std::memcpy(&nni[0], &num[0], sizeof(num[0]) * num.size()); 
 }
 
+crypto::buffer_t NNI::toBuffer() const{
+    crypto::buffer_t buf; 
+    buf.resize(nni.size()*8); 
+    std::memcpy(&buf[0], &nni[0], sizeof(nni[0]) * nni.size()); 
+    return buf; 
+}
+
 size_t NNI::size() const{
     if(nni.size() == 1 && nni.at(0) == 0) return 0; 
     return nni.size(); 
@@ -75,8 +80,10 @@ void NNI::randnni(size_t digits){
     crypto::buffer_t buffer;
     crypto::rdrand(digits*sizeof(NNI::digit_t),buffer);
     assert(buffer.size()>=digits);
-    nni = NNI(buffer).nni;
-    assert(!(this==0));
+    nni.resize(buffer.size()/8);
+    std::memcpy(&nni[0], &buffer[0], sizeof(buffer[0]) * buffer.size()); 
+    this->DeleteZeros(); 
+    *this = *this / NNI(10); 
 }
 
 void NNI::clear(){
@@ -124,9 +131,9 @@ std::ostream & operator<<(std::ostream &out, const NNI &priv){
     // for (size_t i=0; i<priv.size(); i++) {
     //     if (i%2 == 0)
     //         out << std::setw(4) << std::setfill(' ') << std::hex << i << ":";
-    //     std::bitset<64> y(priv.nni[i]); 
-    //     out << std::dec << y << ' '; 
-    //     //out << " " << std::setw(16) << std::setfill('0') << std::hex << priv.nni[i];
+    //     // std::bitset<64> y(priv.nni[i]); 
+    //     // out << std::dec << y << ' '; 
+    //     out << " " << std::setw(16) << std::setfill('0') << std::hex << priv.nni[i];
     //     if (i%2 == 1)
     //         out << "\n";
     // }
@@ -184,6 +191,7 @@ NNI operator+(const NNI &u,const NNI &v){
     NNI res;
     NNI::digit_t carry = 0; 
     auto i = u.nni.begin(); 
+    //TODO: resize res instead of push_back
     for(auto j = v.nni.begin(); i != u.nni.end() | j != v.nni.end(); ){
         NNI::digit_t sum = 0; 
         NNI::digit_t ival = i == u.nni.end()? 0:*i, jval = j == v.nni.end()? 0:*j; 
@@ -222,11 +230,18 @@ NNI operator+=(const NNI &u,const NNI &v){
     return u + v; 
 }
 
+NNI & operator+=(NNI &u,const NNI &v){
+    NNI temp = u; 
+    u = temp + v;
+    return u; 
+}
+
 NNI operator-(const NNI &u,const NNI &v){
     if(u < v) throw Subtraction; 
     NNI res;
     NNI::digit_t borrow = 0; 
-    auto i = u.nni.begin(); 
+    auto i = u.nni.begin();
+    //TODO: resize res instead of push_back 
     for(auto j = v.nni.begin(); i != u.nni.end() | j != v.nni.end();){
         NNI::digit_t diff = 0; 
         NNI::digit_t ival = i == u.nni.end()? 0:*i, jval = j == v.nni.end()? 0:*j; 
@@ -381,6 +396,7 @@ NNI::l_digit_t qprime(NNI::digit_t u, NNI::digit_t u1, NNI::digit_t u2, NNI::dig
 
 }
 
+//TODO: throw your own exception
 NNI divide(const NNI &u, const NNI &v, NNI &remainder){
     if(v == 0) throw std::overflow_error("DIVIDE BY ZERO");  
     if(u == 0) return NNI(static_cast<NNI::digit_t>(0)); 
@@ -464,13 +480,14 @@ NNI divide(const NNI &u, const NNI &v, NNI &remainder){
     //                                divisor.nni.at(n-2));
 
     //     NNI::b_digit_t qpbuf = { static_cast<NNI::digit_t>(qp), static_cast<NNI::digit_t>(qp >> 64)}; 
-    //     NNI w = divisor * (NNI(qpbuf) << (k * 64));
+    //     NNI w = divisor * (NNI(static_cast<NNI::digit_t>(qp)) << (k * 64));
     //     std::cout << remainder << std::endl;
     //     std::cout << w << std::endl;
     //     if(w > remainder){
-    //         qp -= 1; 
+    //         qp = qp - 1; 
     //         NNI::b_digit_t qpbuf2 = { static_cast<NNI::digit_t>(qp), static_cast<NNI::digit_t>(qp >> 64)}; 
-    //         w = v * (NNI(qpbuf2) << (k * 64)); 
+    //         w = divisor * (NNI(static_cast<NNI::digit_t>(qp)) << (k * 64)); 
+    //         std::cout << w << std::endl;
     //     }
     //     if(k > quotient.size()-1 || !quotient.size()) quotient.nni.resize(k+1);
     //     quotient.nni.at(k) = qp;
@@ -487,61 +504,85 @@ NNI divide(const NNI &u, const NNI &v, NNI &remainder){
     pow2_64 <<= 64; 
 
     shifts = __builtin_clzll(divisor.nni.at(n-1));
-    divisor = divisor << shifts; 
+    divisor = divisor << shifts;  
     dividend.nni.push_back(0);
-    dividend.nni.at(m) = static_cast<NNI::l_digit_t>(dividend.nni.at(m-1)) >> (64-shifts); 
-    for(int i = m-1; i > 0; i--){
-        dividend.nni.at(i) = (dividend.nni.at(i) << shifts) |
-                 (static_cast<NNI::l_digit_t>(dividend.nni.at(i-1)) >> (64 - shifts)); 
-    }
-    dividend.nni.at(0) = dividend.nni.at(0) << shifts; 
-    //dividend.nni.push_back(0);
+    dividend = dividend << shifts; 
 
     
     for(long int k = m-n; k >= 0; --k){
         NNI::l_digit_t rp = static_cast<NNI::l_digit_t>(dividend.nni.at(k+n)) * pow2_64 + static_cast<NNI::l_digit_t>(dividend.nni.at(k+n-1)); 
         NNI::l_digit_t qp = rp / static_cast<NNI::l_digit_t>(divisor.nni.at(n-1)); 
         rp %= divisor.nni.at(n-1); 
-        //dividend.DeleteZeros(); 
 
-        if(qp == pow2_64){
+
+        // if(qp == pow2_64){
+        //     qp -= 1; 
+        //     rp += divisor.nni.at(n-1); 
+        // }
+        again:
+        if(qp >= pow2_64 || 
+            static_cast<NNI::digit_t>(qp) * static_cast<NNI::l_digit_t>(divisor.nni.at(n-2)) > pow2_64 * rp + dividend.nni.at(k+n-2)){
             qp -= 1; 
             rp += divisor.nni.at(n-1); 
+            if(rp < pow2_64) goto again; 
         }
         
-        while(rp < pow2_64 && (qp * divisor.nni.at(n-2) > pow2_64 * rp + dividend.nni.at(k+n-2))){
-            qp -= 1; 
-            rp += divisor.nni.at(n-1); 
-        }
+        // while(rp < pow2_64 && (qp * divisor.nni.at(n-2) > pow2_64 * rp + dividend.nni.at(k+n-2))){
+        //     qp -= 1; 
+        //     rp += divisor.nni.at(n-1); 
+        // }
          
 
-        __int128_t carry = 0, widedigit; 
-        __int128_t fs = 0xffffffffffffffffLL; 
-        for(long int i = 0; i < n; ++i){
-            NNI::l_digit_t prod = static_cast<NNI::digit_t>(qp) * static_cast<NNI::l_digit_t>(divisor.nni.at(i)); 
-            widedigit = (static_cast<NNI::l_digit_t>(dividend.nni.at(k+i)) + carry) - (prod & fs); 
-            dividend.nni.at(k+i) = static_cast<NNI::digit_t>(widedigit); 
-            carry = (widedigit >> 64) - (prod >> 64); 
-        }
-        widedigit = static_cast<NNI::l_digit_t>(dividend.nni.at(k+n)) + carry; 
-        dividend.nni.at(k+n) = widedigit; 
+        // __int128_t carry = 0, widedigit = 0; 
+        // __int128_t fs = 0xffffffffffffffffLL; 
+        // for(long int i = 0; i < n; ++i){
+        //     NNI::l_digit_t prod = static_cast<NNI::digit_t>(qp) * static_cast<NNI::l_digit_t>(divisor.nni.at(i)); 
+        //     widedigit = (static_cast<NNI::l_digit_t>(dividend.nni.at(k+i)) + carry) - (prod & fs); 
+        //     dividend.nni.at(k+i) = static_cast<NNI::digit_t>(widedigit); 
+        //     carry = (widedigit >> 64) - (prod >> 64); 
+        // }
+        // widedigit = static_cast<NNI::l_digit_t>(dividend.nni.at(k+n)) + carry; 
+        // dividend.nni.at(k+n) = widedigit; 
+        __int128_t fs = 0xffffffffffffffffLL;
+        __int128_t carry = 0, t; 
+        for(int i = 0; i < n; i++){
+            NNI::l_digit_t p = static_cast<NNI::digit_t>(qp) * static_cast<NNI::l_digit_t>(divisor.nni.at(i));  
+            t = static_cast<NNI::l_digit_t>(dividend.nni.at(i+k) ) - carry - (p & fs); 
+            dividend.nni.at(i+k) = static_cast<NNI::digit_t>(t); 
+            carry = (p >> 64) - (t >> 64); 
+        }   
+        t = static_cast<NNI::l_digit_t>(dividend.nni.at(k+n)) - carry; 
+        dividend.nni.at(k+n) = static_cast<NNI::digit_t>(t); 
 
         if(k > quotient.size()-1 || !quotient.size()) quotient.nni.resize(k+1);
         quotient.nni.at(k) = qp;
 
-        if(widedigit < 0){
+        // if(widedigit < 0){
+        //     quotient.nni.at(k) -= 1; 
+        //     widedigit = 0;
+        //     for(long int i = 0; i < n; i++){
+        //         widedigit += static_cast<NNI::l_digit_t>(dividend.nni.at(k+i)) + divisor.nni.at(i); 
+        //         dividend.nni.at(k+i) = static_cast<NNI::digit_t>(widedigit); 
+        //         widedigit >>= 64; 
+        //     }
+        //     dividend.nni.at(k+n) += static_cast<NNI::digit_t>(carry);  
+        // }
+        if(t < 0){
             quotient.nni.at(k) -= 1; 
-            widedigit = 0;
-            for(long int i = 0; i < n; i++){
-                widedigit += static_cast<NNI::l_digit_t>(dividend.nni.at(k+i)) + divisor.nni.at(i); 
-                dividend.nni.at(k+i) = static_cast<NNI::digit_t>(widedigit); 
-                widedigit >>= 64; 
+            carry = 0; 
+            for(int i = 0; i < n; i++){
+                t = static_cast<NNI::l_digit_t>(dividend.nni.at(i+k)) + divisor.nni.at(i) + carry; 
+                dividend.nni.at(i+k) = static_cast<NNI::digit_t>(t); 
+                carry = t >> 64; 
             }
-            dividend.nni.at(k+n) += static_cast<NNI::digit_t>(carry);  
+            dividend.nni.at(k+n) += static_cast<NNI::digit_t>(carry); 
         }
     }
-
-    //remainder = dividend >> shifts; 
+    
+    remainder = dividend >> shifts; 
+    //remainder = u-(v*quotient); 
+    remainder.DeleteZeros(); 
+    quotient.DeleteZeros(); 
     // for(int i = 0; i < n-1; ++i){
     //     remainder.nni.at(i) = (dividend.nni.at(i) >> shifts) | 
     //         (static_cast<NNI::l_digit_t>(dividend.nni.at(i+1)) << (64-shifts)); 
@@ -551,8 +592,9 @@ NNI divide(const NNI &u, const NNI &v, NNI &remainder){
     //     if(*i != 0) break;
     //     remainder.nni.erase(std::next(i).base()); 
     // }
-    remainder = u - (v * quotient); 
-    quotient.DeleteZeros(); 
+    // if(remainder != u - (v * quotient)){
+    //     throw Subtraction; 
+    // }
 
     return quotient; 
 }
@@ -651,15 +693,7 @@ bool operator<(const NNI &u,const NNI &v){
 }
 
 bool operator>(const NNI &u,const NNI &v){
-    if(u.size() < v.size()) return 0;
-    else if (u.size() > v.size()) return 1;  
-
-    auto ui = u.nni.rbegin(); 
-    for(auto vi = v.nni.rbegin(); vi != v.nni.rend(); vi++, ui++){
-        if(*ui < *vi) return 0; 
-        else if (*ui > *vi) return 1; 
-    }
-    return 0; 
+    return (v < u); 
 }
 
 bool operator<=(const NNI &u,const NNI &v){
@@ -676,4 +710,5 @@ NNI NNI::operator=(const digit_t &v){
 
 NNI NNI::operator=(const b_digit_t &v){
     return NNI(v); 
+}
 }
