@@ -120,6 +120,27 @@ namespace crypto {
         NNI * phi = (NNI*)malloc(sizeof(phi));
     } RSAprivate; 
 
+    // Alice:   s = generate()
+    // Alice:   e = encode(s,A's private key)
+    //      Alice --e--> Bob
+    // Bob:     t = generate(e)
+    // Bob:     f = encode(t,B's private key)
+    //      Alice <--f-- Bob
+    // Bob:     k = combine(e,t,A's public key)
+    // Alice:   k = combine(f,s,B's public key)
+    typedef struct dh_secret_t {
+        NNI p;      // prime
+        NNI g;      // base, usually 2
+        NNI a;      // my half of the secret, any random number
+    } dh_secret_t;
+
+    typedef struct dh_exchange_t {
+        NNI p;        // prime
+        NNI g;        // base, usually 2
+        NNI half;  // encoded half secret; g^a mod p
+        NNI sig;    // authentication; hash(half)^priv.d mod priv.n
+    } dh_exchange_t;
+
     #define cpuid(func,ax,bx,cx,dx)\
      __asm__ __volatile__ ("cpuid":\
      "=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func)); 
@@ -229,6 +250,22 @@ namespace crypto {
     */
     bool readFile(const char* filename, RSApublic &pub);
     /*
+        Write dh_secret to file
+    */
+    bool writeFile(const char* filename, dh_secret_t &priv);
+    /*
+       Write dh_exchange to file
+    */
+    bool writeFile(const char* filename, dh_exchange_t &pub);
+    /*
+        Read a .zek file and put it into dh_secret
+    */
+    bool readFile(const char* filename, dh_secret_t &priv);
+    /*
+        Read a .zek file and put it into dh_exchange
+    */
+    bool readFile(const char* filename , dh_exchange_t &pub);
+    /*
         ToBuffer takes a string and converts it into a buffer
         Best done with a key 
         For example 00F12A would become a buffer with elements 00 F1 2A
@@ -332,26 +369,6 @@ namespace crypto {
     bool encode_rsa(const buffer_t message, buffer_t &cipher, const RSApublic &pub); 
     bool decode_rsa(buffer_t &message, const buffer_t cipher, const RSAprivate &key);
 
-    // Alice:   s = generate()
-    // Alice:   e = encode(s,A's private key)
-    //      Alice --e--> Bob
-    // Bob:     t = generate(e)
-    // Bob:     f = encode(t,B's private key)
-    //      Alice <--f-- Bob
-    // Bob:     k = combine(e,t,A's public key)
-    // Alice:   k = combine(f,s,B's public key)
-    typedef struct dh_secret_t {
-        NNI p;      // prime
-        NNI g;      // base, usually 2
-        NNI a;      // my half of the secret, any random number
-    } dh_secret_t;
-
-    typedef struct dh_exchange_t {
-        NNI p;        // prime
-        NNI g;        // base, usually 2
-        NNI half;  // encoded half secret; g^a mod p
-        NNI sig;    // authentication; hash(half)^priv.d mod priv.n
-    } dh_exchange_t;
 
     // create a new half of a DH secret, if e is given check it and be compatible with it (else fail)
     bool dh_generate(dh_secret_t &secret, const dh_exchange_t *e = nullptr);

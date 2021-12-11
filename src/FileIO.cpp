@@ -4,7 +4,71 @@
 // NOTICE: there is NOT using namespace std here on purpose
 
 namespace crypto {
+
+    bool writeFile(const char* filename, dh_secret_t &priv){
+        std::string s(filename); 
+        if(s.substr(s.length()-4) != ".zek") s.append(".zek"); 
+        std::ofstream dhpriv(s, std::ios::out | std::ios::app); 
+        if(dhpriv){
+            dhpriv << priv.a; 
+            dhpriv << priv.g; 
+            dhpriv << priv.p; 
+            return true; 
+        } else return false;
+    }
+
+    bool writeFile(const char* filename, dh_exchange_t &pub){
+        std::string s(filename); 
+        if(s.substr(s.length()-4) != ".zek") s.append(".zek"); 
+        std::ofstream dhpub(s, std::ios::out | std::ios::app); 
+        if(dhpub){
+            dhpub << pub.g; 
+            dhpub << pub.p; 
+            dhpub << pub.half; 
+            dhpub << pub.sig; 
+            return true; 
+        } else return false;
+    }
+
+    bool readFile(const char* filename, dh_secret_t &priv){
+        std::string s(filename); 
+        if(s.substr(s.length()-4) != ".zek") return false; 
+        std::string line;
+        std::ifstream privfile(filename, std::ios::in | std::ios::app); 
+        if(!privfile) return false; 
+        if(!getline(privfile, line)) return false; 
+        priv.a = NNI(line.c_str());
+        if(!getline(privfile, line)) return false; 
+        priv.g = NNI(line.c_str()); 
+        getline(privfile, line); 
+        priv.p = NNI(line.c_str()); 
+        getline(privfile, line); 
+        if(getline(privfile, line)) return false; 
+        return true; 
+    }  
+
+    bool readFile(const char* filename , dh_exchange_t &pub){
+        std::string s(filename); 
+        if(s.substr(s.length()-4) != ".zek") return false; 
+        std::string line;
+        std::ifstream pubfile(filename, std::ios::in | std::ios::app); 
+        if(!pubfile) return false; 
+        if(!getline(pubfile, line)) return false; 
+        pub.g = NNI(line.c_str());
+        if(!getline(pubfile, line)) return false; 
+        pub.p = NNI(line.c_str()); 
+        getline(pubfile, line); 
+        pub.half = NNI(line.c_str()); 
+        getline(pubfile, line); 
+        pub.sig = NNI(line.c_str()); 
+        getline(pubfile, line); 
+        if(getline(pubfile, line)) return false; 
+        return true; 
+    } 
+
     bool readFile(const char* filename, RSApublic &pub){
+        std::string s(filename); 
+        if(s.substr(s.length()-4) != ".iyo") return false; 
         std::string line;
         std::ifstream pubfile(filename, std::ios::in | std::ios::app); 
         if(!pubfile) return false; 
@@ -18,6 +82,8 @@ namespace crypto {
     }   
     
     bool readFile(const char* filename, RSAprivate &priv){
+        std::string s(filename); 
+        if(s.substr(s.length()-4) != ".iyo") return false; 
         std::string line;
         std::ifstream privfile(filename, std::ios::in | std::ios::app); 
         if(!privfile) return false;

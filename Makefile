@@ -204,4 +204,4 @@ endif
 endif
 
 clean:
-	rm -f bin/*.o bin/*.so rand tests xor aescbc aesecb sha rsa
+	rm -f bin/*.o bin/*.so rand tests xor aescbc aesecb sha rsa dh nni
