@@ -28,6 +28,13 @@
       <a href="#about-the-project">About The Project</a>
     </li>
     <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li>
         <a href="#usage">Usage</a>
         <ul>
             <li><a href="#Random">Random</a></li>
@@ -36,13 +43,6 @@
             <li><a href="#SHA">SHA</a></li>
             <li><a href="#RSA">RSA</a></li>
         </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
     </li>
     <!-- <li><a href="#roadmap">Roadmap</a></li> -->
     <!-- <li><a href="#contributing">Contributing</a></li> -->
@@ -64,6 +64,56 @@
 `github_username`, `repo_name`, `twitter_handle`, `email`, `project_title`, `project_description` -->
 
 This is a library for cryptographic tools that are being made during CS350V-03 Banned Software. All of the code was/is being written by Iyobed Zekarias for educational purposes. 
+
+<!-- GETTING STARTED -->
+## Getting Started
+
+To get a local copy up and running follow these simple steps.
+
+### Prerequisites
+
+You will need to have some c++ compiler. 
+You can install the gnu gcc compiler on windows or clang on mac
+
+#### Windows
+Download WSL. Instructions here https://docs.microsoft.com/en-us/windows/wsl/install-win10
+Open WSL and run the following commands
+* gcc
+ ```sh
+ sudo apt-get update
+ sudo apt-get install build-essential manpages-dev
+ ```
+
+* verify
+ ```sh
+ gcc --version
+ ```
+
+#### Mac
+Open Terminal and run the following commands
+
+* clang
+ ```sh
+ xcode-select --install
+ ```
+
+Follow installation directions
+
+* verify
+ ```sh
+ clang --version
+ ```
+
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/Lipscomb-CCT/crypto-IyobedZekarias.git
+   ```
+2. Build
+   ```sh
+   make
+   ```
 
 
 <!-- USAGE EXAMPLES -->
@@ -217,55 +267,7 @@ SHA2-512 returns a block that is 512 bits long. The issue with SHA2-512 is that 
 
  ```
 
-<!-- GETTING STARTED -->
-## Getting Started
 
-To get a local copy up and running follow these simple steps.
-
-### Prerequisites
-
-You will need to have some c++ compiler. 
-You can install the gnu gcc compiler on windows or clang on mac
-
-#### Windows
-Download WSL. Instructions here https://docs.microsoft.com/en-us/windows/wsl/install-win10
-Open WSL and run the following commands
-* gcc
- ```sh
- sudo apt-get update
- sudo apt-get install build-essential manpages-dev
- ```
-
-* verify
- ```sh
- gcc --version
- ```
-
-#### Mac
-Open Terminal and run the following commands
-
-* clang
- ```sh
- xcode-select --install
- ```
-
-Follow installation directions
-
-* verify
- ```sh
- clang --version
- ```
-
-### Installation
-
-1. Clone the repo
-   ```sh
-   git clone https://github.com/Lipscomb-CCT/crypto-IyobedZekarias.git
-   ```
-2. Build
-   ```sh
-   make
-   ```
 
 
 
