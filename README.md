@@ -2,7 +2,7 @@
 <!-- TABLE OF CONTENTS -->
 
 <p align="center">
-  <a href="https://github.com/Lipscomb-CCT/crypto-IyobedZekarias">
+  <a href="https://github.com/IyobedZekarias/Crypto">
     <img src="logo.png" alt="Logo" width="80" height="80">
   </a>
 
