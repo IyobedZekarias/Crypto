@@ -16,8 +16,8 @@ objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o NNI.o dh.o
 
 lib: bin/crypto_xor.o bin/crypto_rand.o bin/crypto_aes.o \
 bin/FileIO.o bin/crypto_sha.o bin/crypto_rsa.o bin/NNI.o bin/crypto_dh.o
-	g++ -shared $^ -o bin/lib$(LibName).so  $(Lib) -Wl,-rpath=$(rmsp) -Wl,--whole-archive -lfftw3l -Wl,--no-whole-archive
-# $(Lib) -Wl,-rpath=$(rmsp) -Wl,--whole-archive -lfftw3f -Wl,--no-whole-archive
+	g++ -shared $^ -o bin/lib$(LibName).so  $(Lib) -Wl,-rpath,$(rmsp) -Wl,--whole-archive -lfftw3l -Wl,--no-whole-archive
+# $(Lib) -Wl,-rpath,$(rmsp) -Wl,--whole-archive -lfftw3f -Wl,--no-whole-archive
 
 xor.o: src/crypto_xor.cpp
 	g++ -c -fPIC $(CPPFLAGS) $^ -o bin/crypto_$@
@@ -50,11 +50,11 @@ xor: progs/xor.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s xor.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 	
 
@@ -62,22 +62,22 @@ rand: progs/rand.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s rand.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 file: progs/file.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s FileIO.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 aes:
@@ -87,33 +87,33 @@ aesecb: progs/aesecb.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s aes.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 aescbc: progs/aescbc.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s aes.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 sha: progs/sha.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s sha.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 rsa: progs/rsa.cpp
@@ -121,42 +121,42 @@ ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s NNI.o
 	@make -s rsa.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 nni: progs/nni.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s NNI.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 dh: progs/dh.cpp
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
 	@make -s dh.o
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName)
 endif
 
 tests: progs/tests.cpp 
 ifneq ("$(wildcard $(PATH_TO_FILE))","")
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName) 
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName) 
 else
 	@make -s objs
 	@make -s lib
-	g++ $(Lib) -Wl,-rpath=$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName) 
+	g++ $(Lib) -Wl,-rpath,$(rmsp) $(CPPFLAGS) -o $@ $^ -l$(LibName) 
 endif
 
 test: tests 
