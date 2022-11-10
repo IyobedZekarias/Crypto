@@ -11,6 +11,25 @@ rmsp:=$(subst $(space),\$(space),$(dir))
 CPPFLAGS = -g -std=gnu++17 -mrdseed -mrdrnd -maes -msha -fpermissive
 Lib = -L$(rmsp)
 
+_: objs lib
+
+ifeq ($(PREFIX),)
+    PREFIX := /usr/local
+endif
+
+prorab_prefix := $(DESTDIR)$(PREFIX)
+    ifeq ($(filter %/,$(prorab_prefix)),) # make sure the prefix ends with /
+        prorab_prefix := $(prorab_prefix)/
+    endif
+
+install: bin/lib$(LibName).so
+	install -d $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 bin/libcrypto_iz.so $(DESTDIR)$(PREFIX)/lib/
+	install -d $(DESTDIR)$(PREFIX)/include/
+	install -m 644 src/crypto_iz.h $(DESTDIR)$(PREFIX)/include/
+	install -m 644 src/NNI.h $(DESTDIR)$(PREFIX)/include/
+	rm -f bin/*.o bin/*.so
+
 
 objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o NNI.o dh.o
 

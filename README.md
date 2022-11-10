@@ -110,9 +110,10 @@ Follow installation directions
    ```sh
    git clone https://github.com/Lipscomb-CCT/crypto-IyobedZekarias.git
    ```
-2. Build
+2. Build & Install
    ```sh
    make
+   make install
    ```
 
 
@@ -120,15 +121,7 @@ Follow installation directions
 ## Usage
 To use this library you will need to build it first. There are only a couple steps to build the library. 
 
-1. Make the object files
-```sh
-make objs
-```
-2. Make the shared library
-```sh
-make lib
-```
-3. Run any of the demo programs OR Create the actual programs
+Run any of the demo programs OR Create the actual programs
 ```sh
 make p=<options> demo
       options: xor, rand, aesecb, aescbc, sha

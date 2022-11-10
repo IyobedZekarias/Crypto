@@ -1,4 +1,4 @@
-#include "crypto.h"
+#include "crypto_iz.h"
 
 
 #define RSAbits 64

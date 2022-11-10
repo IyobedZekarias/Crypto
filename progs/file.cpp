@@ -1,4 +1,4 @@
-#include "../src/crypto.h"
+#include "../src/crypto_iz.h"
 
 using namespace crypto;
 

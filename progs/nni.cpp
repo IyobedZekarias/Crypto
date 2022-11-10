@@ -1,8 +1,8 @@
-#include "../src/crypto.h"
+#include "../src/crypto_iz.h"
 // #include <iostream>
 // #include <cassert>
 // #include <random>
-// #include "../src/crypto.h"
+// #include "../src/crypto_iz.h"
 using namespace std;
 using namespace crypto; 
 void set_n_rand_digits(NNI &n,size_t digits)

@@ -1,4 +1,4 @@
-#include "crypto.h"
+#include "crypto_iz.h"
 #include "fftw3.h"
 using namespace crypto; 
 

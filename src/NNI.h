@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <tgmath.h>
 #include <exception>
-#include "crypto.h"
+#include "crypto_iz.h"
 
 class NNI {
 private: 
