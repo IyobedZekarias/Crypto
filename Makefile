@@ -24,12 +24,11 @@ prorab_prefix := $(DESTDIR)$(PREFIX)
     endif
 
 install: bin/lib$(LibName).so
-	install -d $(DESTDIR)$(PREFIX)/lib/
-	install -m 644 bin/libcrypto_iz.so $(DESTDIR)$(PREFIX)/lib/
-	install -d $(DESTDIR)$(PREFIX)/include/
-	install -m 644 src/crypto_iz.h $(DESTDIR)$(PREFIX)/include/
-	install -m 644 src/NNI.h $(DESTDIR)$(PREFIX)/include/
-	rm -f bin/*.o bin/*.so
+	install -d $(DESTDIR)$(PREFIX)/lib
+	install -m 644 bin/libcrypto_iz.so $(DESTDIR)$(PREFIX)/lib
+	install -d $(DESTDIR)$(PREFIX)/include
+	install -m 644 src/crypto_iz.h $(DESTDIR)$(PREFIX)/include
+	install -m 644 src/NNI.h $(DESTDIR)$(PREFIX)/include
 
 objs: xor.o rand.o aes.o FileIO.o sha.o rsa.o NNI.o dh.o
 
